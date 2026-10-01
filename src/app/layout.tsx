@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { InlineScript } from "@/components/layout/inline-script";
+import { PlaceholderBanner } from "@/components/layout/placeholder-banner";
+import { PlausibleScript } from "@/components/layout/plausible-script";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { siteConfig } from "@/config/site";
@@ -62,11 +64,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Aller au contenu
         </a>
+        <PlaceholderBanner />
         <SiteHeader />
         <main id="contenu" className="flex-1">
           {children}
         </main>
         <SiteFooter />
+        <PlausibleScript />
       </body>
     </html>
   );

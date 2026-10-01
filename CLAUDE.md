@@ -15,11 +15,12 @@ récit à la première personne. Jamais un comparatif générique.
 
 ## Stack
 
-- Next.js 16 (App Router), React 19, TypeScript strict (+ `noUncheckedIndexedAccess`), pnpm
+- Next.js 16 (App Router), React 19, TypeScript strict (+ `noUncheckedIndexedAccess`), pnpm,
+  `"type": "module"`
 - Tailwind CSS v4 (config dans `src/app/globals.css`, pas de `tailwind.config`)
 - shadcn/ui (style new-york, base Radix) — voir « Environnement » pour l'ajout de composants
 - content-collections pour les articles MDX (phase 5)
-- Zod pour la validation des données (phase 2)
+- Zod 4 pour la validation des données
 - Supabase pour les leads (phase 6)
 - Plausible pour l'analytics (événements serveur via l'API Events)
 - Vitest pour les tests, ESLint (config Next + Prettier), Prettier (+ plugin Tailwind)
@@ -32,7 +33,8 @@ récit à la première personne. Jamais un comparatif générique.
 
 ```bash
 pnpm dev            # serveur de dev
-pnpm build          # build de production
+pnpm build          # check:content puis next build
+pnpm check:content  # valide les données + garde-fou placeholders (BLOCK_PLACEHOLDERS=true pour tester le blocage)
 pnpm check          # lint + typecheck + format:check + test (à lancer avant chaque commit)
 pnpm test           # Vitest
 pnpm typecheck      # next typegen && tsc --noEmit
@@ -45,7 +47,7 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) lance `pnpm check` puis `pnpm 
 
 ```
 content/articles/            # P5 · articles MDX
-scripts/                     # P2 · garde-fous de build (placeholders)
+scripts/check-content.ts     # garde-fou lancé avant next build (exécuté par Node, sans build)
 supabase/migrations/         # P6 · schéma + RLS
 src/
   app/                       # routes (App Router)
@@ -66,9 +68,13 @@ src/
     affiliate/ tools/ calculator/ leads/ seo/   # à venir
   config/site.ts             # nom, URL (valeurs entre crochets à remplir)
   config/author.ts           # parcours, chiffres clés, citation de l'auteur (faits réels uniquement)
-  data/tools.ts              # P2 · SEULE source des données outils (remplie par le propriétaire)
+  data/tools.ts              # SEULE source des données outils (remplie par le propriétaire)
+  data/tools.schema.ts       # type RestaurantTool + schéma Zod (unités documentées)
   lib/
-    regulatory.ts            # P2 · SEULE source des affirmations réglementaires
+    regulatory.ts            # SEULE source des affirmations réglementaires
+    affiliate.ts             # URL d'affiliation (env), CTA selon le programme partenaire
+    go-redirect.ts           # logique de /go/[tool] ; plausible.ts : API Events
+    content-guard.ts         # détection des placeholders, mode strict
     cost/                    # P3 · calculs purs + tests
     theme.ts utils.ts …
 ```
@@ -81,9 +87,11 @@ src/
    toujours via `/go/[tool]` (bloqué dans `robots.txt`).
 2. **Zéro donnée inventée.** Aucun prix, commission, taux, engagement ou fonctionnalité écrit en
    dur ailleurs que dans `src/data/tools.ts`, que le propriétaire remplit lui-même. Valeur factice
-   = commentaire `// PLACEHOLDER` + `isPlaceholder: true`. Effet : avertissement visible en
-   développement et en preview ; **le build de production échoue** (`VERCEL_ENV=production`, ou
-   `NODE_ENV=production` hors Vercel). Même règle pour les articles marqués placeholder.
+   = commentaire `// PLACEHOLDER` + `isPlaceholder: true`. Effet : bandeau « Brouillon » en
+   développement et en preview ; **le build de production échoue** (`VERCEL_ENV=production` ou
+   `BLOCK_PLACEHOLDERS=true`), tout comme un outil en affiliation sans `AFFILIATE_URL_<SLUG>`.
+   Les builds locaux et CI passent avec avertissement. Même règle pour auteur, réglementaire et
+   articles.
 3. **Réglementaire centralisé.** Toute affirmation réglementaire (certification des caisses,
    facturation électronique, titres-restaurant…) vit dans `src/lib/regulatory.ts` avec une
    **source** et une **date de vérification**. Les pages l'importent, ne la réécrivent jamais.
@@ -103,12 +111,28 @@ Décisions prises :
   `/mise-en-relation`, jamais à `/go/`.
 - Aucune transmission automatique de lead : validation manuelle par le propriétaire.
 
+## Liens partenaires et analytics
+
+- Une variable `AFFILIATE_URL_<SLUG>` par outil en affiliation (slug en majuscules, `-` → `_`),
+  https obligatoire. Liste documentée dans `.env.example` : la tenir à jour à chaque outil ajouté.
+- Les boutons passent toujours par `<ToolCta tool fromPath />` (`src/components/affiliate/`) :
+  affiliation → `/go/<slug>?from=<page>` avec `rel="sponsored noopener"` et « Lien partenaire » ;
+  apport d'affaires → `/mise-en-relation?outil=<slug>` avec « Mise en relation rémunérée » ;
+  aucun → pas de bouton.
+- `/go/[tool]` : 302 vers l'URL partenaire, 404 sinon, `noindex` + `no-store`. L'événement
+  Plausible « Affiliate Click » (props `tool`, `page`) part via `after()` : la redirection
+  n'attend jamais l'analytics.
+
 ## Conventions de code
 
 - Server Components par défaut ; `"use client"` seulement pour l'interactivité.
 - Logique métier = fonctions pures dans `src/lib/`, testées avec Vitest (`*.test.ts` à côté du
   fichier). Les pages ne font qu'afficher.
 - Imports via l'alias `@/`. `import type` pour les types (règle ESLint).
+- **Exception** : les modules lus par `scripts/check-content.ts` (`src/data/*`, `src/config/*`,
+  `src/lib/regulatory.ts`, `affiliate.ts`, `content-guard.ts` et leurs dépendances) sont
+  exécutés directement par Node : imports relatifs avec extension `.ts`, pas d'alias, pas de
+  syntaxe TypeScript non effaçable (enum, namespace). `pnpm check:content` le vérifie.
 - Noms de fichiers en kebab-case, composants en PascalCase, URL publiques en français.
 - Pas de couleur en dur dans les composants : utiliser les tokens (`bg-canvas`, `bg-surface`,
   `text-ink`, `text-ink-muted`, `text-brass`, `text-go`, `border-line`, `night`) ou ceux de shadcn.
@@ -147,10 +171,10 @@ brillent), traduits en ardoise et laiton. Haut de gamme, moderne, qui inspire co
   squelettes et icônes uniquement, **jamais de chiffre ni d'interface d'un outil réel**.
 - Typographies : **Instrument Serif** (h1, h2), **Geist** (texte, h3 en 600), **Geist Mono**
   (prix, taux, dates, surtitres `.eyebrow`).
-- Thème : préférence système par défaut, forçable via `data-theme` sur `<html>` (bouton en
-  en-tête, mémorisé en `localStorage`, appliqué avant le premier rendu par un script inline).
-  Les variables sombres sont déclarées **deux fois** dans `globals.css` (media query + attribut) :
-  un test Vitest vérifie qu'elles restent identiques.
+- Thème : **sombre par défaut** (décision du propriétaire, ne suit pas la préférence système).
+  Le mode clair s'active via le bouton (`data-theme="light"` sur `<html>`, mémorisé en
+  `localStorage`, appliqué avant le premier rendu par un script inline). Variante Tailwind
+  `dark:` = « pas en mode clair ».
 - Composants signature (`src/components/brand/`) : `SpecCard` (fiche technique, bordure en
   dégradé et halo), `Seal` (sceau lumineux), `HeroVisual`, classe `.spec-line`.
 
@@ -180,7 +204,7 @@ méthode.
 ## Avancement
 
 - [x] Phase 1 — Fondations (outillage, CLAUDE.md, direction visuelle « Ardoise & Laiton », thème clair/sombre)
-- [ ] Phase 2 — Modèle de données et liens d'affiliation
+- [x] Phase 2 — Modèle de données et liens d'affiliation
 - [ ] Phase 3 — Calculateur de coût réel
 - [ ] Phase 4 — Pages comparatif et avis
 - [ ] Phase 5 — Articles MDX et SEO
