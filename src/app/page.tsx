@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { HeroVisual } from "@/components/brand/hero-visual";
-import { Seal, SpecCard } from "@/components/brand/spec-card";
+import { SpecCard } from "@/components/brand/spec-card";
 import { author } from "@/config/author";
-import { CALCULATOR_PATH } from "@/lib/routes";
+import { AUTHOR_PATH, CALCULATOR_PATH, CATEGORY_PATHS } from "@/lib/routes";
 
 const fieldCriteria = [
   {
@@ -46,21 +46,25 @@ const fieldCriteria = [
 const categories = [
   {
     icon: Store,
+    href: CATEGORY_PATHS.caisse,
     title: "Logiciels de caisse",
     body: "Abonnement, matériel, multi-sites, mode hors ligne.",
   },
   {
     icon: CreditCard,
+    href: CATEGORY_PATHS.paiement,
     title: "Terminaux de paiement",
     body: "Commission carte, location ou achat, titres-restaurant.",
   },
   {
     icon: CalendarCheck,
+    href: CATEGORY_PATHS.reservation,
     title: "Réservation en ligne",
     body: "No-show, acompte, commission par couvert.",
   },
   {
     icon: ShoppingBag,
+    href: CATEGORY_PATHS["commande-en-ligne"],
     title: "Commande en ligne",
     body: "Click & collect, livraison, intégration caisse.",
   },
@@ -88,9 +92,9 @@ export default function Home() {
               <a href="#comparatifs" className="btn-glow">
                 Voir les comparatifs <ArrowRight aria-hidden className="size-4" />
               </a>
-              <a href="#parcours" className="btn-ghost">
+              <Link href={AUTHOR_PATH} className="btn-ghost">
                 Mon parcours
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -146,20 +150,22 @@ export default function Home() {
             Les outils du service
           </h2>
           <ul className="mt-10 grid gap-4 sm:grid-cols-2">
-            {categories.map(({ icon: Icon, title, body }) => (
+            {categories.map(({ icon: Icon, href, title, body }) => (
               <li key={title}>
-                <SpecCard className="flex h-full gap-4">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-line text-brass">
-                    <Icon aria-hidden className="size-5" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="text-lg">{title}</h3>
-                      <Seal>Bientôt</Seal>
+                <Link href={href} className="group block h-full">
+                  <SpecCard className="flex h-full gap-4">
+                    <span className="grid size-11 shrink-0 place-items-center rounded-xl border border-line text-brass">
+                      <Icon aria-hidden className="size-5" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="flex items-center justify-between gap-2 text-lg group-hover:text-brass">
+                        {title}
+                        <ArrowRight aria-hidden className="size-4 text-brass" />
+                      </h3>
+                      <p className="mt-1.5 text-sm text-ink-muted">{body}</p>
                     </div>
-                    <p className="mt-1.5 text-sm text-ink-muted">{body}</p>
-                  </div>
-                </SpecCard>
+                  </SpecCard>
+                </Link>
               </li>
             ))}
           </ul>

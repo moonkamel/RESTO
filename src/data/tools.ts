@@ -34,6 +34,14 @@ const data: RestaurantTool[] = [
     strengths: ["[Point fort à renseigner]"],
     watchouts: ["[Point de vigilance à renseigner]"],
     fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
+    fieldTest: {
+      testedAt: "2026-09-15", // PLACEHOLDER
+      context: "[TYPE D'ÉTABLISSEMENT, COUVERTS, SERVICE]", // PLACEHOLDER
+      rush: { score: 4, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      extraOnboarding: { score: 3, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      offline: { score: 5, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      kitchenTickets: { score: 4, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+    },
     partnerProgram: "affiliation",
     slug: "exemple-caisse-a",
     verifiedAt: "2026-10-01",
@@ -60,6 +68,14 @@ const data: RestaurantTool[] = [
     strengths: ["[Point fort à renseigner]"],
     watchouts: ["[Point de vigilance à renseigner]"],
     fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
+    fieldTest: {
+      testedAt: "2026-09-15", // PLACEHOLDER
+      context: "[TYPE D'ÉTABLISSEMENT, COUVERTS, SERVICE]", // PLACEHOLDER
+      rush: { score: 5, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      extraOnboarding: { score: 5, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      offline: { score: 2, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      kitchenTickets: { score: null, verdict: "[SANS OBJET : EXPLIQUER POURQUOI]" }, // PLACEHOLDER
+    },
     partnerProgram: "affiliation",
     slug: "exemple-tpe-b",
     verifiedAt: "2026-10-01",
@@ -86,6 +102,7 @@ const data: RestaurantTool[] = [
     strengths: ["[Point fort à renseigner]"],
     watchouts: ["[Point de vigilance à renseigner]"],
     fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
+    fieldTest: null, // PLACEHOLDER — pas encore testé en service
     partnerProgram: "apport-affaires",
     slug: "exemple-resa-c",
     verifiedAt: "2026-10-01",
@@ -112,6 +129,14 @@ const data: RestaurantTool[] = [
     strengths: ["[Point fort à renseigner]"],
     watchouts: ["[Point de vigilance à renseigner]"],
     fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
+    fieldTest: {
+      testedAt: "2026-09-15", // PLACEHOLDER
+      context: "[TYPE D'ÉTABLISSEMENT, COUVERTS, SERVICE]", // PLACEHOLDER
+      rush: { score: 3, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      extraOnboarding: { score: 4, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      offline: { score: null, verdict: "[SANS OBJET : EXPLIQUER POURQUOI]" }, // PLACEHOLDER
+      kitchenTickets: { score: 3, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+    },
     partnerProgram: "aucun",
     slug: "exemple-commande-d",
     verifiedAt: "2026-10-01",
@@ -138,6 +163,14 @@ const data: RestaurantTool[] = [
     strengths: ["[Point fort à renseigner]"],
     watchouts: ["[Point de vigilance à renseigner]"],
     fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
+    fieldTest: {
+      testedAt: "2026-09-15", // PLACEHOLDER
+      context: "[TYPE D'ÉTABLISSEMENT, COUVERTS, SERVICE]", // PLACEHOLDER
+      rush: { score: 4, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      extraOnboarding: { score: 4, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      offline: { score: 3, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+      kitchenTickets: { score: 5, verdict: "[VERDICT À RÉDIGER]" }, // PLACEHOLDER
+    },
     partnerProgram: "apport-affaires",
     slug: "exemple-caisse-e",
     verifiedAt: "2026-10-01",

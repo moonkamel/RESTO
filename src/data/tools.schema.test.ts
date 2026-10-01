@@ -21,6 +21,14 @@ const valid: RestaurantTool = {
   strengths: ["Rapide"],
   watchouts: ["Engagement"],
   fieldReview: "Un avis terrain suffisamment long pour passer la validation.",
+  fieldTest: {
+    testedAt: "2026-01-10",
+    context: "Brasserie, 120 couverts, samedi soir",
+    rush: { score: 4, verdict: "Envoi rapide." },
+    extraOnboarding: { score: 3, verdict: "Dix minutes d'explication." },
+    offline: { score: 5, verdict: "Encaisse sans réseau." },
+    kitchenTickets: { score: null, verdict: "Pas d'imprimante cuisine." },
+  },
   partnerProgram: "affiliation",
   slug: "outil-test",
   verifiedAt: "2026-01-15",
@@ -93,6 +101,20 @@ describe("toolSchema", () => {
     expect(issues({ ...valid, cardCommissionRate: 1.5 })).toContain("cardFixedFeeHT");
     expect(issues({ ...valid, cardCommissionRate: 1.5, cardFixedFeeHT: 0 })).toEqual([]);
     expect(issues({ ...valid, cardFixedFeeHT: 0.1 })).toContain("cardFixedFeeHT");
+  });
+
+  it("valide le test en service : notes de 1 à 5 ou null, date non future", () => {
+    expect(issues({ ...valid, fieldTest: null })).toEqual([]);
+    const ft = valid.fieldTest!;
+    expect(issues({ ...valid, fieldTest: { ...ft, rush: { score: 6, verdict: "x" } } })).toContain(
+      "fieldTest.rush.score",
+    );
+    expect(issues({ ...valid, fieldTest: { ...ft, rush: { score: 4, verdict: "" } } })).toContain(
+      "fieldTest.rush.verdict",
+    );
+    expect(issues({ ...valid, fieldTest: { ...ft, testedAt: "2999-01-01" } })).toContain(
+      "fieldTest.testedAt",
+    );
   });
 
   it("refuse une date de vérification dans le futur", () => {

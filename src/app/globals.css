@@ -34,6 +34,7 @@
   --night-brass: #d2b07a;
   --night-line: #222b35;
   --night-steel: #8fa3b8; /* second ton des dégradés lumineux */
+  --night-alert: #f2685e; /* alerte lisible sur bandeau sombre */
   --glow: rgb(122 92 36 / 0.14); /* halo des cartes */
   --night-glow: rgb(210 176 122 / 0.35); /* halo des bandeaux sombres */
   /* Graphiques : 3 teintes validées (daltonisme, contraste) par mode. */
@@ -120,6 +121,7 @@
   --color-night-brass: var(--night-brass);
   --color-night-line: var(--night-line);
   --color-night-steel: var(--night-steel);
+  --color-night-alert: var(--night-alert);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);

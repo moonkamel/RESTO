@@ -53,9 +53,11 @@ src/
   app/                       # routes (App Router)
     globals.css              # tokens de thème + composants signature
     go/[tool]/route.ts       # P2 · redirection affiliée + événement Plausible
-    (comparatifs)/…          # P4 · /logiciel-caisse-restaurant, etc.
-    (etablissements)/…       # P4 · /caisse-food-truck, etc.
-    avis/[tool]/             # P4 · avis par outil
+    logiciel-caisse-restaurant/ terminal-paiement-restaurant/
+    reservation-en-ligne-restaurant/ commande-en-ligne-restaurant/   # comparatifs (gabarit commun)
+    caisse-food-truck/ caisse-brasserie/ caisse-boulangerie/ caisse-multi-sites/
+    avis/[tool]/             # avis par outil (statique, generateStaticParams)
+    auteur/                  # page auteur (parcours, adresses, protocole de test)
     calculateur-cout-caisse/ # calculateur abonnement / commission
     guides/[slug]/           # P5 · articles
     mise-en-relation/        # P6 · formulaire 3 étapes
@@ -67,7 +69,12 @@ src/
     brand/                   # élément signature (fiche technique, sceau)
     affiliate/               # ToolCta, DisclosureBanner
     calculator/              # CostCalculator (client), CostChart
-    tools/ leads/ seo/       # à venir
+    comparison/              # ComparisonPage (gabarit), RankingMethod, RegulatoryNotes, RelatedPages
+    tools/                   # ToolCard, ComparisonTable, FieldTestBox, ScoreMeter, badges
+    leads/ seo/              # à venir
+  content/
+    comparison-pages.ts      # textes éditoriaux des 8 pages (jamais de prix ni de taux : testé)
+    navigation.ts            # menus et pied de page
   config/site.ts             # nom, URL (valeurs entre crochets à remplir)
   config/author.ts           # parcours, chiffres clés, citation de l'auteur (faits réels uniquement)
   data/tools.ts              # SEULE source des données outils (remplie par le propriétaire)
@@ -116,6 +123,19 @@ Décisions prises :
 - Outils en apport d'affaires (sans lien d'affiliation) : le bouton mène au formulaire
   `/mise-en-relation`, jamais à `/go/`.
 - Aucune transmission automatique de lead : validation manuelle par le propriétaire.
+
+## Classement éditorial (pages comparatif et établissement)
+
+- Note terrain = moyenne des critères « Testé en service » notés (1 à 5, `null` = sans objet),
+  arrondie au dixième (`src/lib/ranking.ts`). Outils non testés (`fieldTest: null`) classés
+  après. Égalité : vérification la plus récente, puis ordre alphabétique.
+- Le programme partenaire n'intervient JAMAIS dans le classement. La règle est affichée par
+  `<RankingMethod />` (« Comment on classe ») sur chaque page comparatif et sur la page auteur.
+- Toute page qui classe des outils commence par `<DisclosureBanner />`, avant le classement.
+- Pages établissement : caisses ET terminaux (`caisse` + `paiement`) du type concerné ;
+  multi-sites = caisses avec `multiSite: true`.
+- Tableaux : `<ComparisonTable />` dans une zone à défilement horizontal focalisable, première
+  colonne figée. Chaque outil affiche sa date de vérification (`<VerifiedDate />`).
 
 ## Calculateur
 
@@ -227,7 +247,7 @@ méthode.
 - [x] Phase 1 — Fondations (outillage, CLAUDE.md, direction visuelle « Ardoise & Laiton », thème clair/sombre)
 - [x] Phase 2 — Modèle de données et liens d'affiliation
 - [x] Phase 3 — Calculateur de coût réel
-- [ ] Phase 4 — Pages comparatif et avis
+- [x] Phase 4 — Pages comparatif et avis
 - [ ] Phase 5 — Articles MDX et SEO
 - [ ] Phase 6 — Formulaire de mise en relation
 - [ ] Phase 7 — Pages légales

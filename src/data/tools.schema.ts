@@ -18,6 +18,32 @@ export const ESTABLISHMENT_TYPES = [
   "boulangerie",
 ] as const;
 
+export const PRICING_MODEL_LABELS: Record<PricingModel, string> = {
+  abonnement: "Abonnement",
+  commission: "Commission",
+  mixte: "Abonnement + commission",
+};
+
+export const ESTABLISHMENT_LABELS: Record<EstablishmentType, string> = {
+  restaurant: "Restaurant",
+  brasserie: "Brasserie",
+  bar: "Bar",
+  "restauration-rapide": "Restauration rapide",
+  "food-truck": "Food truck",
+  boulangerie: "Boulangerie",
+};
+
+/** Les 4 critères du bloc « Testé en service », dans l'ordre d'affichage. */
+export const FIELD_CRITERIA = ["rush", "extraOnboarding", "offline", "kitchenTickets"] as const;
+export type FieldCriterion = (typeof FIELD_CRITERIA)[number];
+
+export const FIELD_CRITERIA_LABELS: Record<FieldCriterion, string> = {
+  rush: "Rapidité en coup de feu",
+  extraOnboarding: "Prise en main par un extra",
+  offline: "Coupure internet",
+  kitchenTickets: "Lisibilité des tickets en cuisine",
+};
+
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   caisse: "Logiciel de caisse",
   paiement: "Terminal de paiement",
@@ -32,6 +58,27 @@ const slug = z
 const text = z.string().trim().min(1, "Champ vide");
 
 const isoDate = z.iso.date("Date attendue au format AAAA-MM-JJ");
+
+/** Note terrain de 1 à 5. null = critère sans objet pour cet outil (le verdict dit pourquoi). */
+const fieldCriterion = z
+  .object({
+    score: z.int().min(1).max(5).nullable(),
+    verdict: text,
+  })
+  .strict();
+
+const fieldTest = z
+  .object({
+    /** Date du test en conditions réelles. */
+    testedAt: isoDate,
+    /** Où et quand : type d'établissement, couverts, service. */
+    context: text,
+    rush: fieldCriterion,
+    extraOnboarding: fieldCriterion,
+    offline: fieldCriterion,
+    kitchenTickets: fieldCriterion,
+  })
+  .strict();
 
 /** Montant en euros HT. null = sans objet pour cet outil (voir chaque champ). */
 const euros = z.number().nonnegative().finite();
@@ -66,6 +113,8 @@ export const toolSchema = z
     strengths: z.array(text).min(1, "Au moins un point fort"),
     watchouts: z.array(text).min(1, "Au moins un point de vigilance"),
     fieldReview: z.string().trim().min(40, "Avis terrain trop court (40 caractères minimum)"),
+    /** Test en service réel. null = pas encore testé en service (affiché tel quel). */
+    fieldTest: fieldTest.nullable(),
     partnerProgram: z.enum(PARTNER_PROGRAMS),
     slug,
     verifiedAt: isoDate,
@@ -104,11 +153,19 @@ export const toolSchema = z
           "Frais fixes par transaction : renseignés (0 si aucun) si et seulement si il y a un taux de commission",
       });
     }
-    if (tool.verifiedAt > new Date().toISOString().slice(0, 10)) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (tool.verifiedAt > today) {
       ctx.addIssue({
         code: "custom",
         path: ["verifiedAt"],
         message: "Date de vérification future",
+      });
+    }
+    if (tool.fieldTest && tool.fieldTest.testedAt > today) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["fieldTest", "testedAt"],
+        message: "Date de test future",
       });
     }
   });

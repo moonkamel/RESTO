@@ -4,6 +4,7 @@ import { Minus, PhoneCall, Plus, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { ToolCta } from "@/components/affiliate/tool-cta";
+import { PlaceholderBadge, VerifiedDate } from "@/components/tools/badges";
 import { LEAD_FORM_PATH } from "@/lib/affiliate";
 import {
   compareTools,
@@ -15,7 +16,7 @@ import {
   type InputErrors,
   type RawInputs,
 } from "@/lib/cost/cost";
-import { formatEuros, formatIsoDate } from "@/lib/format";
+import { formatEuros } from "@/lib/format";
 import { CALCULATOR_PATH } from "@/lib/routes";
 import { CostChart } from "./cost-chart";
 
@@ -221,8 +222,8 @@ function Results({ inputs, comparison }: { inputs: CostInputs; comparison: Compa
               : `${best.tool.commitmentMonths} mois`}
             .
           </li>
-          <li>Tarifs vérifiés le {formatIsoDate(best.tool.verifiedAt)}.</li>
         </ul>
+        <VerifiedDate date={best.tool.verifiedAt} className="mt-3" />
         <RecommendationActions tool={best.tool} />
       </div>
 
@@ -297,14 +298,6 @@ function RecommendationActions({ tool }: { tool: CostTool }) {
         </div>
       )}
     </div>
-  );
-}
-
-function PlaceholderBadge() {
-  return (
-    <span className="rounded-full border border-destructive px-2.5 py-0.5 font-mono text-[0.6875rem] tracking-wider text-destructive uppercase">
-      Données factices
-    </span>
   );
 }
 

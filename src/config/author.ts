@@ -11,6 +11,7 @@
 
 export type AuthorStat = { value: string; label: string };
 export type AuthorMilestone = { period: string; title: string; body: string };
+export type AuthorVenue = { name: string; type: string; area: string; since: string };
 
 export const author = {
   isPlaceholder: true, // PLACEHOLDER — à remplacer par tes informations réelles
@@ -47,6 +48,28 @@ export const author = {
   ],
   quote:
     "[CITATION PERSONNELLE — par exemple la phrase que vous répétez à vos équipes avant le service]",
+  /** Présentation longue (page auteur), un paragraphe par entrée. */
+  bio: [
+    "[PARAGRAPHE 1 — d'où vous venez : formation, premières maisons, ce que la cuisine vous a appris.]",
+    "[PARAGRAPHE 2 — le passage à la gestion : premier établissement, ce qui a marché, ce qui a coûté cher.]",
+    "[PARAGRAPHE 3 — aujourd'hui : vos adresses, vos équipes, ce que vous attendez d'un outil.]",
+  ],
+  /** Établissements gérés (affichés sur la page auteur). */
+  venues: [
+    { name: "[NOM]", type: "[TYPE]", area: "Paris [ARRONDISSEMENT]", since: "[ANNÉE]" },
+    { name: "[NOM]", type: "[TYPE]", area: "Paris [ARRONDISSEMENT]", since: "[ANNÉE]" },
+    { name: "[NOM]", type: "[TYPE]", area: "Paris [ARRONDISSEMENT]", since: "[ANNÉE]" },
+  ],
+  /**
+   * Comment les tests « en service » sont faits. Doit décrire ce qui est VRAIMENT fait :
+   * c'est l'engagement qui justifie la note terrain.
+   */
+  testingProtocol: [
+    "[ÉTAPE 1 — où l'outil est installé (quel établissement) et pendant combien de services.]",
+    "[ÉTAPE 2 — comment la prise en main par un extra est testée.]",
+    "[ÉTAPE 3 — comment la coupure internet est simulée.]",
+    "[ÉTAPE 4 — comment la brigade juge la lisibilité des tickets.]",
+  ],
 } as const satisfies {
   isPlaceholder: boolean;
   name: string;
@@ -55,4 +78,7 @@ export const author = {
   pitch: string;
   milestones: readonly AuthorMilestone[];
   quote: string;
+  bio: readonly string[];
+  venues: readonly AuthorVenue[];
+  testingProtocol: readonly string[];
 };
