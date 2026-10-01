@@ -31,7 +31,14 @@ const DEFAULTS: RawInputs = {
   externalCardFixedFee: "",
 };
 
-export function CostCalculator({ tools }: { tools: CostTool[] }) {
+export function CostCalculator({
+  tools,
+  fromPath = CALCULATOR_PATH,
+}: {
+  tools: CostTool[];
+  /** Page qui affiche le calculateur (attribution des clics partenaires). */
+  fromPath?: string;
+}) {
   const [raw, setRaw] = useState<RawInputs>(DEFAULTS);
   const validation = useMemo(() => validateInputs(raw), [raw]);
   const errors: InputErrors = validation.ok ? {} : validation.errors;
@@ -166,7 +173,7 @@ export function CostCalculator({ tools }: { tools: CostTool[] }) {
           Résultat
         </h2>
         {shown && shown.comparison.ranked.length > 0 ? (
-          <Results inputs={shown.inputs} comparison={shown.comparison} />
+          <Results inputs={shown.inputs} comparison={shown.comparison} fromPath={fromPath} />
         ) : (
           <div className="spec-card text-ink-muted">
             {shown
@@ -179,7 +186,15 @@ export function CostCalculator({ tools }: { tools: CostTool[] }) {
   );
 }
 
-function Results({ inputs, comparison }: { inputs: CostInputs; comparison: Comparison }) {
+function Results({
+  inputs,
+  comparison,
+  fromPath,
+}: {
+  inputs: CostInputs;
+  comparison: Comparison;
+  fromPath: string;
+}) {
   const [best, second] = comparison.ranked;
   if (!best) return null;
   const { breakEven, incomplete } = comparison;
@@ -224,7 +239,7 @@ function Results({ inputs, comparison }: { inputs: CostInputs; comparison: Compa
           </li>
         </ul>
         <VerifiedDate date={best.tool.verifiedAt} className="mt-3" />
-        <RecommendationActions tool={best.tool} />
+        <RecommendationActions tool={best.tool} fromPath={fromPath} />
       </div>
 
       {/* Point de bascule */}
@@ -274,7 +289,7 @@ function Results({ inputs, comparison }: { inputs: CostInputs; comparison: Compa
   );
 }
 
-function RecommendationActions({ tool }: { tool: CostTool }) {
+function RecommendationActions({ tool, fromPath }: { tool: CostTool; fromPath: string }) {
   if (tool.partnerProgram === "aucun") {
     return (
       <p className="mt-6 text-sm text-ink-muted">
@@ -284,7 +299,7 @@ function RecommendationActions({ tool }: { tool: CostTool }) {
   }
   return (
     <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
-      <ToolCta tool={tool} fromPath={CALCULATOR_PATH} />
+      <ToolCta tool={tool} fromPath={fromPath} />
       {tool.partnerProgram === "affiliation" && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <Link

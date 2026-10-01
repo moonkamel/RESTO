@@ -19,7 +19,7 @@ récit à la première personne. Jamais un comparatif générique.
   `"type": "module"`
 - Tailwind CSS v4 (config dans `src/app/globals.css`, pas de `tailwind.config`)
 - shadcn/ui (style new-york, base Radix) — voir « Environnement » pour l'ajout de composants
-- content-collections pour les articles MDX (phase 5)
+- content-collections (`@content-collections/core`, `/next`, `/mdx`) pour les articles MDX
 - Zod 4 pour la validation des données
 - Supabase pour les leads (phase 6)
 - Plausible pour l'analytics (événements serveur via l'API Events)
@@ -34,7 +34,8 @@ récit à la première personne. Jamais un comparatif générique.
 ```bash
 pnpm dev            # serveur de dev
 pnpm build          # check:content puis next build
-pnpm check:content  # valide les données + garde-fou placeholders (BLOCK_PLACEHOLDERS=true pour tester le blocage)
+pnpm check:content  # génère les articles, valide les données + garde-fou placeholders (BLOCK_PLACEHOLDERS=true pour tester le blocage)
+pnpm content        # génère seulement les articles (.content-collections/, ignoré par git)
 pnpm check          # lint + typecheck + format:check + test (à lancer avant chaque commit)
 pnpm test           # Vitest
 pnpm typecheck      # next typegen && tsc --noEmit
@@ -46,8 +47,10 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) lance `pnpm check` puis `pnpm 
 ## Arborescence
 
 ```
-content/articles/            # P5 · articles MDX
+content/articles/*.mdx       # articles (frontmatter validé par src/content/article.schema.ts)
+content-collections.ts       # collection « articles » (compilation MDX)
 scripts/check-content.ts     # garde-fou lancé avant next build (exécuté par Node, sans build)
+scripts/build-content.ts     # génère les articles hors Next (typecheck, CI, garde-fou)
 supabase/migrations/         # P6 · schéma + RLS
 src/
   app/                       # routes (App Router)
@@ -59,7 +62,9 @@ src/
     avis/[tool]/             # avis par outil (statique, generateStaticParams)
     auteur/                  # page auteur (parcours, adresses, protocole de test)
     calculateur-cout-caisse/ # calculateur abonnement / commission
-    guides/[slug]/           # P5 · articles
+    guides/ guides/[slug]/   # index des guides, article MDX (+ opengraph-image.tsx)
+    opengraph-image.tsx      # image de partage par défaut ; avis/[tool]/ en a une propre
+    sitemap.ts robots.ts     # plan du site (dates réelles), robots (bloque /go/ et /admin/)
     mise-en-relation/        # P6 · formulaire 3 étapes
     admin/leads/             # P6 · suivi des leads (protégé)
     (legal)/…                # P7 · pages légales
@@ -71,8 +76,12 @@ src/
     calculator/              # CostCalculator (client), CostChart
     comparison/              # ComparisonPage (gabarit), RankingMethod, RegulatoryNotes, RelatedPages
     tools/                   # ToolCard, ComparisonTable, FieldTestBox, ScoreMeter, badges
-    leads/ seo/              # à venir
+    mdx/                     # composants utilisables dans les articles
+    seo/                     # JsonLd, Breadcrumbs (fil d'Ariane visible + BreadcrumbList)
+    leads/                   # à venir
+  assets/fonts/              # Instrument Serif TTF (OFL) pour les images Open Graph
   content/
+    article.schema.ts        # schéma du frontmatter des articles
     comparison-pages.ts      # textes éditoriaux des 8 pages (jamais de prix ni de taux : testé)
     navigation.ts            # menus et pied de page
   config/site.ts             # nom, URL (valeurs entre crochets à remplir)
@@ -87,6 +96,8 @@ src/
     cost/cost.ts             # calculateur : coûts, classement, point de bascule (testé à la main)
     format.ts                # € et dates en français
     routes.ts                # chemins internes partagés (jamais exportés d'un module client)
+    articles.ts              # lecture des articles générés (content-collections)
+    seo/                     # pageMetadata, builders JSON-LD, sitemap, rendu des images OG
     theme.ts utils.ts …
 ```
 
@@ -141,7 +152,8 @@ Décisions prises :
 
 - Formules : `coût = fixe + pente × CA mensuel`, avec
   `fixe = (abonnement + poste supp. × (postes − 1)) × mois + matériel × postes` et
-  `pente = mois × part carte × (taux + frais fixes / ticket moyen)`. Frais carte hors TVA,
+  `pente = mois × part carte × (taux + frais fixes / ticket moyen)`. Montants comparés hors TVA
+  (régime TVA des frais carte : `regulatory.ts`, entrée `tva-frais-encaissement`),
   abonnement et matériel HT. Toute modification de formule = nouveau cas vérifié à la main dans
   `cost.test.ts` (calcul écrit en commentaire).
 - Point de bascule : CA où l'offre à la commission la moins chère et l'offre avec abonnement
@@ -151,6 +163,33 @@ Décisions prises :
 - Graphique : barres empilées, couleurs `--chart-1..3` validées par le script de la skill
   dataviz (daltonisme + contraste, clair et sombre). Le tableau de détail est la version
   accessible.
+
+## Articles MDX
+
+- Frontmatter obligatoire : `title` (≤ 90), `description` (70–170), `publishedAt`, `updatedAt`,
+  `category`, `establishmentType`, `author: principal`, `sources` (≥ 1 source https hors
+  placeholder), `faq` (optionnel → FAQPage), `isPlaceholder`. Un article invalide fait échouer
+  `pnpm content`, `pnpm build` et `next dev`.
+- Composants MDX (`src/components/mdx/mdx-components.tsx`) : `<CostCalculator />`,
+  `<ComparisonTable category="…" establishment="…" />` ou `slugs={[…]}`, `<ToolCard slug />`,
+  `<FieldTestBox slug />`, `<RegulatoryNote topic />`. Ils lisent `tools.ts` / `regulatory.ts` :
+  **jamais de prix, de taux ni de règle en dur dans un article**. Un slug inconnu fait échouer le
+  build (donc renommer un outil impose de mettre à jour les articles).
+- Les passages à écrire par le propriétaire sont marqués `[ANECDOTE À ÉCRIRE — …]` ou
+  `[INTRO À PERSONNALISER — …]`. Claude n'invente pas d'anecdote vécue.
+
+## SEO
+
+- Chaque page exporte `pageMetadata({ title, description, path, … })` (`src/lib/seo/metadata.ts`) :
+  canonique, Open Graph, Twitter, image par défaut. Une route avec son propre
+  `opengraph-image.tsx` passe `image: "<chemin>/opengraph-image"` (Next n'hérite pas l'image
+  quand une page redéfinit`openGraph`).
+- JSON-LD via `<JsonLd data={[…]} />` et les builders testés de `src/lib/seo/jsonld.ts` :
+  `WebSite` (accueil), `Article` + `FAQPage` (guides), `Review` (avis, **seulement si l'outil a
+  une note terrain** : pas d'avis noté sans test), `BreadcrumbList` (via `<Breadcrumbs />`).
+- Sitemap : `lastModified` = date réelle (vérification des outils, mise à jour des articles),
+  jamais la date du build. L'URL du site vient de `NEXT_PUBLIC_SITE_URL`, sinon du domaine de
+  production Vercel.
 
 ## Liens partenaires et analytics
 
@@ -248,6 +287,6 @@ méthode.
 - [x] Phase 2 — Modèle de données et liens d'affiliation
 - [x] Phase 3 — Calculateur de coût réel
 - [x] Phase 4 — Pages comparatif et avis
-- [ ] Phase 5 — Articles MDX et SEO
+- [x] Phase 5 — Articles MDX et SEO
 - [ ] Phase 6 — Formulaire de mise en relation
 - [ ] Phase 7 — Pages légales

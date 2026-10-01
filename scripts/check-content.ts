@@ -4,13 +4,20 @@
  * - En production (VERCEL_ENV=production ou BLOCK_PLACEHOLDERS=true), tout contenu factice
  *   ou lien d'affiliation manquant fait aussi échouer le build.
  */
+import { buildContent } from "./build-content.ts";
 import { author } from "../src/config/author.ts";
 import { tools } from "../src/data/tools.ts";
 import { checkContent } from "../src/lib/content-guard.ts";
 import { regulatoryClaims } from "../src/lib/regulatory.ts";
 
+// Génère et valide les articles : un frontmatter invalide fait échouer ici.
+await buildContent();
+const { allArticles } = (await import("../.content-collections/generated/index.js")) as {
+  allArticles: { title: string; slug: string; isPlaceholder: boolean }[];
+};
+
 const { strict, errors, warnings } = checkContent(
-  { tools, author, regulatory: regulatoryClaims },
+  { tools, author, regulatory: regulatoryClaims, articles: allArticles },
   process.env,
 );
 
@@ -26,5 +33,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `✓ Contenu valide (${tools.length} outils, mode ${strict ? "production" : "brouillon"}).`,
+  `✓ Contenu valide (${tools.length} outils, ${allArticles.length} articles, mode ${strict ? "production" : "brouillon"}).`,
 );

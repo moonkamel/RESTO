@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { NAV_GROUPS } from "@/content/navigation";
-import { AUTHOR_PATH, CALCULATOR_PATH } from "@/lib/routes";
+import { AUTHOR_PATH, CALCULATOR_PATH, GUIDES_PATH } from "@/lib/routes";
 
 export function SiteFooter() {
   return (
@@ -43,6 +43,14 @@ export function SiteFooter() {
                 className="inline-flex min-h-10 items-center hover:text-night-ink"
               >
                 Calculateur de coût
+              </Link>
+            </li>
+            <li>
+              <Link
+                href={GUIDES_PATH}
+                className="inline-flex min-h-10 items-center hover:text-night-ink"
+              >
+                Guides
               </Link>
             </li>
             <li>

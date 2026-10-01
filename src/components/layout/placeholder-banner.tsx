@@ -1,3 +1,4 @@
+import { allArticles } from "content-collections";
 import { author } from "@/config/author";
 import { tools } from "@/data/tools";
 import { collectPlaceholders, isStrictBuild } from "@/lib/content-guard";
@@ -9,7 +10,12 @@ import { regulatoryClaims } from "@/lib/regulatory";
  */
 export function PlaceholderBanner() {
   if (isStrictBuild(process.env)) return null;
-  const items = collectPlaceholders({ tools, author, regulatory: regulatoryClaims });
+  const items = collectPlaceholders({
+    tools,
+    author,
+    regulatory: regulatoryClaims,
+    articles: allArticles,
+  });
   if (items.length === 0) return null;
 
   return (

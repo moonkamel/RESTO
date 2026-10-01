@@ -8,13 +8,14 @@
     "build": "node scripts/check-content.ts && next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "pnpm content && next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test",
-    "check:content": "node scripts/check-content.ts"
+    "check:content": "node scripts/check-content.ts",
+    "content": "node scripts/build-content.ts"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -27,6 +28,9 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@content-collections/core": "^0.15.3",
+    "@content-collections/mdx": "^0.2.2",
+    "@content-collections/next": "^0.2.11",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22.20.4",
     "@types/react": "^19",

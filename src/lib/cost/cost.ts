@@ -8,7 +8,7 @@ import type { RestaurantTool } from "@/data/tools.schema";
  *   coût(R) = fixe + pente × R
  *   fixe  = (abonnement 1er poste + poste supp. × (postes − 1)) × mois + matériel × postes
  *   pente = mois × part carte × (taux % + frais fixes / ticket moyen)
- * Les frais carte ne sont pas soumis à la TVA ; abonnement et matériel sont en HT.
+ * Tous les montants sont comparés hors TVA (régime TVA des frais carte : voir regulatory.ts).
  */
 
 export const DURATIONS = [12, 24, 36] as const;
@@ -84,6 +84,26 @@ function fixedParts(
     subscription: (first + extra * (inputs.stations - 1)) * inputs.months,
     hardware: (tool.hardwarePriceHT ?? 0) * inputs.stations,
   };
+}
+
+/** Outils du calculateur, réduits aux champs utiles (seuls ceux-là partent vers le navigateur). */
+export function calculatorToolsFrom(tools: readonly RestaurantTool[]): CostTool[] {
+  return tools.filter(isCalculatorTool).map((tool) => ({
+    slug: tool.slug,
+    name: tool.name,
+    publisher: tool.publisher,
+    category: tool.category,
+    pricingModel: tool.pricingModel,
+    subscriptionMonthlyHT: tool.subscriptionMonthlyHT,
+    extraStationMonthlyHT: tool.extraStationMonthlyHT,
+    hardwarePriceHT: tool.hardwarePriceHT,
+    cardCommissionRate: tool.cardCommissionRate,
+    cardFixedFeeHT: tool.cardFixedFeeHT,
+    commitmentMonths: tool.commitmentMonths,
+    partnerProgram: tool.partnerProgram,
+    verifiedAt: tool.verifiedAt,
+    isPlaceholder: tool.isPlaceholder,
+  }));
 }
 
 /** Forme linéaire du coût, ou null si on ne connaît pas les frais carte de l'offre. */

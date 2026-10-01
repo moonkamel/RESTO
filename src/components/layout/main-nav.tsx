@@ -1,6 +1,6 @@
 "use client";
 
-import { Calculator, ChevronDown, LayoutGrid, Menu, UserRound } from "lucide-react";
+import { BookOpen, Calculator, ChevronDown, LayoutGrid, Menu, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -15,10 +15,12 @@ export type NavGroup = { title: string; links: readonly { href: string; label: s
 export function MainNav({
   groups,
   calculatorPath,
+  guidesPath,
   authorPath,
 }: {
   groups: readonly NavGroup[];
   calculatorPath: string;
+  guidesPath: string;
   authorPath: string;
 }) {
   const pathname = usePathname();
@@ -86,6 +88,12 @@ export function MainNav({
             </Link>
           </li>
           <li>
+            <Link href={guidesPath} className={itemClass}>
+              <BookOpen aria-hidden className="size-4 text-night-brass" />
+              Guides
+            </Link>
+          </li>
+          <li>
             <Link href={authorPath} className={itemClass}>
               <UserRound aria-hidden className="size-4 text-night-brass" />
               L&apos;auteur
@@ -124,6 +132,11 @@ export function MainNav({
             <li>
               <Link href={calculatorPath} className={linkClass(calculatorPath)}>
                 Calculateur abonnement ou commission
+              </Link>
+            </li>
+            <li>
+              <Link href={guidesPath} className={linkClass(guidesPath)}>
+                Guides
               </Link>
             </li>
             <li>

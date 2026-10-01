@@ -13,8 +13,12 @@ import {
 import Link from "next/link";
 import { HeroVisual } from "@/components/brand/hero-visual";
 import { SpecCard } from "@/components/brand/spec-card";
+import { JsonLd } from "@/components/seo/json-ld";
 import { author } from "@/config/author";
+import { siteConfig } from "@/config/site";
 import { AUTHOR_PATH, CALCULATOR_PATH, CATEGORY_PATHS } from "@/lib/routes";
+import { websiteJsonLd } from "@/lib/seo/jsonld";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 const fieldCriteria = [
   {
@@ -76,9 +80,25 @@ const commitments = [
   "Date de vérification sur chaque outil",
 ] as const;
 
+export const metadata = pageMetadata({
+  title: `${siteConfig.name} — ${siteConfig.shortDescription}`,
+  description: siteConfig.description,
+  path: "/",
+  absoluteTitle: true,
+});
+
 export default function Home() {
   return (
     <>
+      <JsonLd
+        data={[
+          websiteJsonLd({
+            siteUrl: siteConfig.url,
+            siteName: siteConfig.name,
+            description: siteConfig.description,
+          }),
+        ]}
+      />
       {/* Hero */}
       <section aria-labelledby="titre" className="night dot-grid overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 pt-14 pb-20 sm:px-6 sm:pt-20">

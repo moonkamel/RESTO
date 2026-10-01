@@ -9,21 +9,26 @@ import { FieldScore, ScoreMeter } from "./score";
 export function FieldTestBox({
   tool,
   className,
+  headingLevel = "h2",
 }: {
-  tool: Pick<RestaurantTool, "name" | "fieldTest">;
+  tool: Pick<RestaurantTool, "slug" | "name" | "fieldTest">;
   className?: string;
+  /** h2 sur une page avis, h3 dans un article. */
+  headingLevel?: "h2" | "h3";
 }) {
   const test = tool.fieldTest;
+  const Heading = headingLevel;
+  const headingId = `teste-en-service-${tool.slug}`;
   return (
-    <section aria-labelledby="teste-en-service" className={cn("spec-card", className)}>
+    <section aria-labelledby={headingId} className={cn("spec-card", className)}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="eyebrow inline-flex items-center gap-2 text-brass">
             <Flame aria-hidden className="size-4" /> Testé en service
           </p>
-          <h2 id="teste-en-service" className="mt-2 text-2xl sm:text-3xl">
+          <Heading id={headingId} className="mt-2 font-serif text-2xl font-normal sm:text-3xl">
             {tool.name} en plein coup de feu
-          </h2>
+          </Heading>
         </div>
         <FieldScore score={fieldScore(tool)} />
       </div>

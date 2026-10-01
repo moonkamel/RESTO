@@ -39,6 +39,17 @@ describe("collectPlaceholders", () => {
     });
     expect(items.map((i) => i.kind)).toEqual(["outil", "auteur", "réglementaire"]);
   });
+  it("liste aussi les articles factices", () => {
+    const items = collectPlaceholders({
+      ...clean,
+      articles: [
+        { title: "A", slug: "a", isPlaceholder: true },
+        { title: "B", slug: "b", isPlaceholder: false },
+      ],
+    });
+    expect(items).toEqual([{ kind: "article", label: "A (a)" }]);
+  });
+
   it("ne signale rien quand tout est réel", () => {
     expect(collectPlaceholders(clean)).toEqual([]);
   });

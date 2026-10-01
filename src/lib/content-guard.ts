@@ -15,6 +15,7 @@ export type ContentSources = {
   tools: readonly RestaurantTool[];
   author: { isPlaceholder: boolean; name: string };
   regulatory: readonly { id: string; title: string; isPlaceholder: boolean }[];
+  articles?: readonly { title: string; slug: string; isPlaceholder: boolean }[];
 };
 
 /**
@@ -37,6 +38,9 @@ export function collectPlaceholders(sources: ContentSources): PlaceholderItem[] 
     ...sources.regulatory
       .filter((c) => c.isPlaceholder)
       .map((c) => ({ kind: "réglementaire" as const, label: c.title })),
+    ...(sources.articles ?? [])
+      .filter((a) => a.isPlaceholder)
+      .map((a) => ({ kind: "article" as const, label: `${a.title} (${a.slug})` })),
   ];
 }
 

@@ -10,16 +10,18 @@ import { tools } from "@/data/tools";
 import { formatIsoDate } from "@/lib/format";
 import { rankTools } from "@/lib/ranking";
 import { CALCULATOR_PATH } from "@/lib/routes";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { RankingMethod } from "./ranking-method";
 import { RegulatoryNotes } from "./regulatory-notes";
 import { RelatedPages } from "./related-pages";
 
 export function comparisonMetadata(page: ComparisonPageDef): Metadata {
-  return {
+  return pageMetadata({
     title: page.metaTitle,
     description: page.metaDescription,
-    alternates: { canonical: page.path },
-  };
+    path: page.path,
+  });
 }
 
 /** Gabarit commun aux pages comparatif et établissement. */
@@ -33,8 +35,14 @@ export function ComparisonPage({ page }: { page: ComparisonPageDef }) {
   return (
     <>
       <section aria-labelledby="titre" className="night dot-grid">
-        <div className="mx-auto max-w-6xl px-4 pt-12 pb-14 sm:px-6 sm:pt-16">
-          <p className="eyebrow text-night-brass">{page.eyebrow}</p>
+        <div className="mx-auto max-w-6xl px-4 pt-6 pb-14 sm:px-6">
+          <Breadcrumbs
+            crumbs={[
+              { name: "Accueil", path: "/" },
+              { name: page.metaTitle, path: page.path },
+            ]}
+          />
+          <p className="eyebrow mt-6 text-night-brass">{page.eyebrow}</p>
           <h1 id="titre" className="mt-4 max-w-4xl text-4xl sm:text-6xl">
             {page.title}
           </h1>

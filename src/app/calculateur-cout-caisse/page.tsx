@@ -1,36 +1,18 @@
-import type { Metadata } from "next";
 import { DisclosureBanner } from "@/components/affiliate/disclosure-banner";
+import { RegulatoryNotes } from "@/components/comparison/regulatory-notes";
 import { CostCalculator } from "@/components/calculator/cost-calculator";
 import { tools } from "@/data/tools";
-import { isCalculatorTool, type CostTool } from "@/lib/cost/cost";
+import { calculatorToolsFrom } from "@/lib/cost/cost";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { CALCULATOR_PATH } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Abonnement ou commission : quelle caisse vous coûte le moins ?",
   description:
     "Calculez le coût réel de votre caisse et de votre terminal de paiement sur 12, 24 ou 36 mois : abonnement, matériel et frais carte, selon votre CA.",
-  alternates: { canonical: CALCULATOR_PATH },
-};
-
-/** Seuls les champs utiles au calcul partent vers le navigateur. */
-function toCostTool(tool: (typeof tools)[number]): CostTool {
-  return {
-    slug: tool.slug,
-    name: tool.name,
-    publisher: tool.publisher,
-    category: tool.category,
-    pricingModel: tool.pricingModel,
-    subscriptionMonthlyHT: tool.subscriptionMonthlyHT,
-    extraStationMonthlyHT: tool.extraStationMonthlyHT,
-    hardwarePriceHT: tool.hardwarePriceHT,
-    cardCommissionRate: tool.cardCommissionRate,
-    cardFixedFeeHT: tool.cardFixedFeeHT,
-    commitmentMonths: tool.commitmentMonths,
-    partnerProgram: tool.partnerProgram,
-    verifiedAt: tool.verifiedAt,
-    isPlaceholder: tool.isPlaceholder,
-  };
-}
+  path: CALCULATOR_PATH,
+});
 
 const method = [
   {
@@ -43,7 +25,7 @@ const method = [
   },
   {
     title: "Frais carte",
-    body: "CA payé par carte × taux de commission, + nombre de transactions (CA carte ÷ ticket moyen) × frais fixes, sur la durée. Les frais d'encaissement ne sont pas soumis à la TVA.",
+    body: "CA payé par carte × taux de commission, + nombre de transactions (CA carte ÷ ticket moyen) × frais fixes, sur la durée.",
   },
   {
     title: "Point de bascule",
@@ -52,13 +34,17 @@ const method = [
 ] as const;
 
 export default function CalculatorPage() {
-  const calculatorTools = tools.filter(isCalculatorTool).map(toCostTool);
-
   return (
     <>
       <section aria-labelledby="titre" className="night dot-grid">
-        <div className="mx-auto max-w-6xl px-4 pt-12 pb-14 sm:px-6 sm:pt-16">
-          <p className="eyebrow text-night-brass">Calculateur</p>
+        <div className="mx-auto max-w-6xl px-4 pt-6 pb-14 sm:px-6">
+          <Breadcrumbs
+            crumbs={[
+              { name: "Accueil", path: "/" },
+              { name: "Calculateur", path: CALCULATOR_PATH },
+            ]}
+          />
+          <p className="eyebrow mt-6 text-night-brass">Calculateur</p>
           <h1 id="titre" className="mt-4 max-w-3xl text-4xl sm:text-6xl">
             Abonnement ou commission&nbsp;:{" "}
             <span className="text-shine">quelle caisse vous coûte le moins&nbsp;?</span>
@@ -72,7 +58,7 @@ export default function CalculatorPage() {
 
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:px-6 sm:py-14">
         <DisclosureBanner />
-        <CostCalculator tools={calculatorTools} />
+        <CostCalculator tools={calculatorToolsFrom(tools)} />
 
         <section aria-labelledby="methode" className="pt-8">
           <p className="eyebrow text-brass">Comment on calcule</p>
@@ -88,11 +74,14 @@ export default function CalculatorPage() {
             ))}
           </dl>
           <p className="mt-6 max-w-3xl text-sm text-ink-muted">
-            Ce que le calcul n&apos;inclut pas : frais d&apos;installation ou de formation, options,
-            frais de résiliation, location du matériel, commissions sur les titres-restaurant. Lisez
-            toujours le contrat avant de signer.
+            Tous les montants sont comparés hors TVA. Ce que le calcul n&apos;inclut pas : frais
+            d&apos;installation ou de formation, options, frais de résiliation, location du
+            matériel, commissions sur les titres-restaurant. Lisez toujours le contrat avant de
+            signer.
           </p>
         </section>
+
+        <RegulatoryNotes topics={["tva-frais-encaissement"]} />
       </div>
     </>
   );

@@ -1,22 +1,29 @@
 import { MapPin } from "lucide-react";
-import type { Metadata } from "next";
 import { RankingMethod } from "@/components/comparison/ranking-method";
 import { author } from "@/config/author";
 import { siteConfig } from "@/config/site";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { AUTHOR_PATH } from "@/lib/routes";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: `${author.name}, ${author.role}`,
   description: `Qui teste les outils de ${siteConfig.name} : ${author.role}. Parcours, établissements et méthode de test en service.`,
-  alternates: { canonical: AUTHOR_PATH },
-};
+  path: AUTHOR_PATH,
+});
 
 export default function AuthorPage() {
   return (
     <>
       <section aria-labelledby="titre" className="night dot-grid">
-        <div className="mx-auto max-w-6xl px-4 pt-12 pb-16 sm:px-6 sm:pt-16">
-          <p className="eyebrow text-night-brass">L&apos;auteur</p>
+        <div className="mx-auto max-w-6xl px-4 pt-6 pb-16 sm:px-6">
+          <Breadcrumbs
+            crumbs={[
+              { name: "Accueil", path: "/" },
+              { name: "L'auteur", path: AUTHOR_PATH },
+            ]}
+          />
+          <p className="eyebrow mt-6 text-night-brass">L&apos;auteur</p>
           <h1 id="titre" className="mt-4 text-5xl sm:text-7xl">
             {author.name}
           </h1>

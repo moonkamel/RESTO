@@ -18,10 +18,13 @@ export function ToolCard({
   tool,
   rank,
   fromPath,
+  showRank = true,
 }: {
   tool: RestaurantTool;
   rank: number;
   fromPath: string;
+  /** false hors d'un classement (ex. carte isolée dans un article). */
+  showRank?: boolean;
 }) {
   const features = [
     { label: "Hors ligne", ok: tool.worksOffline },
@@ -31,7 +34,7 @@ export function ToolCard({
 
   return (
     <SpecCard
-      reference={`N° ${rank}`}
+      reference={showRank ? `N° ${rank}` : "Fiche outil"}
       meta={tool.isPlaceholder ? <PlaceholderBadge /> : undefined}
       className="flex h-full flex-col"
     >

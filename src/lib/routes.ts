@@ -3,6 +3,11 @@ import type { EstablishmentType, ToolCategory } from "@/data/tools.schema";
 /** Chemins internes partagés (pages qui existent). */
 export const CALCULATOR_PATH = "/calculateur-cout-caisse";
 export const AUTHOR_PATH = "/auteur";
+export const GUIDES_PATH = "/guides";
+
+export function articlePath(slug: string): string {
+  return `${GUIDES_PATH}/${slug}`;
+}
 
 export const CATEGORY_PATHS: Record<ToolCategory, string> = {
   caisse: "/logiciel-caisse-restaurant",

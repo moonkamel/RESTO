@@ -1,4 +1,4 @@
-import { ArrowLeft, Calculator, Check, X } from "lucide-react";
+import { Calculator, Check, X } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,7 +8,10 @@ import { SpecCard } from "@/components/brand/spec-card";
 import { PlaceholderBadge, VerifiedDate } from "@/components/tools/badges";
 import { FieldTestBox } from "@/components/tools/field-test-box";
 import { FieldScore } from "@/components/tools/score";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { JsonLd } from "@/components/seo/json-ld";
 import { author } from "@/config/author";
+import { siteConfig } from "@/config/site";
 import { getToolBySlug, tools } from "@/data/tools";
 import { CATEGORY_LABELS, ESTABLISHMENT_LABELS, PRICING_MODEL_LABELS } from "@/data/tools.schema";
 import { isCalculatorTool } from "@/lib/cost/cost";
@@ -20,6 +23,8 @@ import {
   formatHardware,
   formatSubscription,
 } from "@/lib/tool-format";
+import { reviewJsonLd } from "@/lib/seo/jsonld";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 export const dynamicParams = false;
 
@@ -30,11 +35,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/avis/[tool]">): Promise<Metadata> {
   const tool = getToolBySlug((await params).tool);
   if (!tool) return {};
-  return {
+  return pageMetadata({
     title: `Avis ${tool.name} : testé en service`,
     description: `Notre avis terrain sur ${tool.name} (${CATEGORY_LABELS[tool.category].toLowerCase()}) : rapidité en coup de feu, prise en main, coupure internet, tickets cuisine, prix vérifiés.`,
-    alternates: { canonical: reviewPath(tool.slug) },
-  };
+    path: reviewPath(tool.slug),
+    image: `${reviewPath(tool.slug)}/opengraph-image`,
+  });
 }
 
 export default async function ReviewPage({ params }: PageProps<"/avis/[tool]">) {
@@ -58,16 +64,32 @@ export default async function ReviewPage({ params }: PageProps<"/avis/[tool]">) 
 
   return (
     <>
+      <JsonLd
+        data={[
+          reviewJsonLd({
+            siteUrl: siteConfig.url,
+            siteName: siteConfig.name,
+            path,
+            toolName: tool.name,
+            publisher: tool.publisher,
+            categoryLabel: CATEGORY_LABELS[tool.category],
+            score: fieldScore(tool),
+            reviewBody: tool.fieldReview,
+            verifiedAt: tool.verifiedAt,
+            author: { name: author.name, path: AUTHOR_PATH },
+          }),
+        ]}
+      />
       <section aria-labelledby="titre" className="night dot-grid">
-        <div className="mx-auto max-w-6xl px-4 pt-10 pb-14 sm:px-6 sm:pt-14">
-          <Link
-            href={categoryPath}
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm text-night-muted hover:text-night-ink"
-          >
-            <ArrowLeft aria-hidden className="size-4" />
-            {CATEGORY_LABELS[tool.category]} : le comparatif
-          </Link>
-          <p className="eyebrow mt-4 text-night-brass">Avis · {CATEGORY_LABELS[tool.category]}</p>
+        <div className="mx-auto max-w-6xl px-4 pt-6 pb-14 sm:px-6">
+          <Breadcrumbs
+            crumbs={[
+              { name: "Accueil", path: "/" },
+              { name: CATEGORY_LABELS[tool.category], path: categoryPath },
+              { name: `Avis ${tool.name}`, path },
+            ]}
+          />
+          <p className="eyebrow mt-6 text-night-brass">Avis · {CATEGORY_LABELS[tool.category]}</p>
           <h1 id="titre" className="mt-4 text-4xl sm:text-6xl">
             {tool.name}
           </h1>

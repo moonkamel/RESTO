@@ -13,6 +13,7 @@ export const REGULATORY_TOPICS = [
   "certification-caisse",
   "facturation-electronique",
   "titres-restaurant",
+  "tva-frais-encaissement",
 ] as const;
 
 const regulatoryClaimSchema = z
@@ -59,6 +60,15 @@ const data: RegulatoryClaim[] = [
     id: "titres-restaurant",
     title: "Titres-restaurant",
     claim: "[À RÉDIGER ET VÉRIFIER — règles d'acceptation des titres-restaurant]",
+    sourceLabel: "[SOURCE OFFICIELLE]",
+    sourceUrl: "",
+    verifiedAt: "2026-10-01",
+    isPlaceholder: true, // PLACEHOLDER
+  },
+  {
+    id: "tva-frais-encaissement",
+    title: "TVA et frais d'encaissement carte",
+    claim: "[À RÉDIGER ET VÉRIFIER — régime de TVA des commissions d'encaissement carte]",
     sourceLabel: "[SOURCE OFFICIELLE]",
     sourceUrl: "",
     verifiedAt: "2026-10-01",
