@@ -9,8 +9,9 @@ apport d'affaires (leads qualifiés transmis manuellement aux éditeurs).
 Cible : restaurateurs indépendants, brasseries, food trucks, boulangeries, petits groupes
 multi-sites, porteurs de projet. Ils lisent **sur mobile, entre deux services**.
 
-Différenciation : l'auteur travaille en cuisine professionnelle. Avis « testé en service »,
-critères pensés pour le coup de feu. Jamais un comparatif générique.
+Différenciation : l'auteur est un restaurateur passé par la cuisine qui gère aujourd'hui
+plusieurs établissements à Paris. Avis « testé en service », critères pensés pour le coup de feu,
+récit à la première personne. Jamais un comparatif générique.
 
 ## Stack
 
@@ -63,7 +64,8 @@ src/
     layout/                  # header, footer, thème
     brand/                   # élément signature (fiche technique, sceau)
     affiliate/ tools/ calculator/ leads/ seo/   # à venir
-  config/site.ts             # nom, URL, auteur (valeurs entre crochets à remplir)
+  config/site.ts             # nom, URL (valeurs entre crochets à remplir)
+  config/author.ts           # parcours, chiffres clés, citation de l'auteur (faits réels uniquement)
   data/tools.ts              # P2 · SEULE source des données outils (remplie par le propriétaire)
   lib/
     regulatory.ts            # P2 · SEULE source des affirmations réglementaires
@@ -87,7 +89,11 @@ src/
    **source** et une **date de vérification**. Les pages l'importent, ne la réécrivent jamais.
    Claude n'écrit pas de contenu réglementaire de lui-même : il crée l'entrée marquée
    « À VÉRIFIER » et le propriétaire la valide.
-4. **Fraîcheur affichée.** Chaque outil affiche publiquement sa date de dernière vérification.
+4. **Parcours de l'auteur vérifiable.** Nombre d'établissements, CA, années, postes : uniquement
+   des faits réels, centralisés dans `src/config/author.ts`. Claude n'invente jamais ces chiffres
+   (pratique commerciale trompeuse) : il laisse des crochets `[N]`, `[X] M€`. `isPlaceholder: true`
+   bloque le build de production comme pour les outils.
+5. **Fraîcheur affichée.** Chaque outil affiche publiquement sa date de dernière vérification.
 
 Décisions prises :
 
@@ -113,39 +119,47 @@ Décisions prises :
 - Accessibilité : contrastes WCAG AA minimum, cibles tactiles ≥ 44 px, focus visible, tout
   fonctionne à 360 px de large, tableaux dans un conteneur à défilement horizontal.
 
-## Direction visuelle — « Ardoise & Laiton »
+## Direction visuelle — « Ardoise & Laiton », version lumineuse
 
-Cabinet de conseil haut de gamme, ancré en cuisine : ardoise profonde, laiton (les cuivres de la
-batterie), grille inox. Sobre, sombre, qui inspire confiance. Pas de gadget visuel.
+Inspiration : sites tech sombres à cadres néon (grille de points, maquettes d'écrans qui
+brillent), traduits en ardoise et laiton. Haut de gamme, moderne, qui inspire confiance.
 
-| Token         | Clair     | Sombre    | Usage                                  |
-| ------------- | --------- | --------- | -------------------------------------- |
-| `--canvas`    | `#f4f3ef` | `#0b0f14` | fond de page                           |
-| `--surface`   | `#ffffff` | `#131a22` | cartes                                 |
-| `--ink`       | `#0e1318` | `#eceae4` | texte                                  |
-| `--ink-muted` | `#4a5260` | `#9aa3ae` | texte secondaire                       |
-| `--brass`     | `#7a5c24` | `#d2b07a` | accent, surtitres, focus               |
-| `--go`        | `#2e6b4a` | `#7cc39b` | validé / positif                       |
-| `--line`      | `#dcd9d1` | `#222b35` | filets                                 |
-| `--night`     | `#0e1318` | `#070a0e` | bandeaux sombres (en-tête, hero, pied) |
+| Token           | Clair     | Sombre    | Usage                                  |
+| --------------- | --------- | --------- | -------------------------------------- |
+| `--canvas`      | `#f4f3ef` | `#0b0f14` | fond de page                           |
+| `--surface`     | `#ffffff` | `#131a22` | cartes                                 |
+| `--ink`         | `#0e1318` | `#eceae4` | texte                                  |
+| `--ink-muted`   | `#4a5260` | `#9aa3ae` | texte secondaire                       |
+| `--brass`       | `#7a5c24` | `#d2b07a` | accent, surtitres, focus               |
+| `--go`          | `#2e6b4a` | `#7cc39b` | validé / positif                       |
+| `--line`        | `#dcd9d1` | `#222b35` | filets                                 |
+| `--night`       | `#0e1318` | `#070a0e` | bandeaux sombres (en-tête, hero, pied) |
+| `--night-steel` | `#8fa3b8` | idem      | second ton des dégradés lumineux       |
 
-- Les bandeaux `.night` (en-tête, hero, pied de page) restent sombres dans les deux modes, avec
-  leurs propres tokens `--night-ink`, `--night-muted`, `--night-brass`, `--night-line`.
-  `.night-grid` ajoute la grille inox en fond.
-- Typographies : **Instrument Serif** (h1, h2 : une seule graisse, grandes tailles),
-  **Geist** (texte, h3 en 600), **Geist Mono** (prix, taux, dates, surtitres `.eyebrow`).
+- Les bandeaux `.night` (en-tête, hero, parcours, pied de page) restent sombres dans les deux
+  modes, avec leurs tokens `--night-ink`, `--night-muted`, `--night-brass`, `--night-line`.
+- Effets (tous en CSS, sans image ni JS) : `.dot-grid` (grille de points estompée), `.aura`
+  (halo laiton/inox), `.glow-frame` (bordure dégradé laiton → inox + halo), `.screen` /
+  `.screen-bar` / `.skeleton` / `.pill-glow` (maquettes d'écran), `.floor` (reflet),
+  `.text-shine` (texte en dégradé), `.btn-glow` / `.btn-ghost` (boutons),
+  `.scroll-progress` (barre de lecture sous l'en-tête, `animation-timeline`).
+- Les maquettes (`src/components/brand/hero-visual.tsx`) sont décoratives (`aria-hidden`) :
+  squelettes et icônes uniquement, **jamais de chiffre ni d'interface d'un outil réel**.
+- Typographies : **Instrument Serif** (h1, h2), **Geist** (texte, h3 en 600), **Geist Mono**
+  (prix, taux, dates, surtitres `.eyebrow`).
 - Thème : préférence système par défaut, forçable via `data-theme` sur `<html>` (bouton en
   en-tête, mémorisé en `localStorage`, appliqué avant le premier rendu par un script inline).
   Les variables sombres sont déclarées **deux fois** dans `globals.css` (media query + attribut) :
   un test Vitest vérifie qu'elles restent identiques.
-- Composants signature (`src/components/brand/spec-card.tsx`, classes dans `globals.css`) :
-  `SpecCard` (fiche technique : filet laiton en tête, numérotation mono), `Seal` (sceau
-  « Validé en service »), classe `.spec-line` (libellé ——— valeur), `.eyebrow` (surtitre).
+- Composants signature (`src/components/brand/`) : `SpecCard` (fiche technique, bordure en
+  dégradé et halo), `Seal` (sceau lumineux), `HeroVisual`, classe `.spec-line`.
 
 ## Ton éditorial
 
 Direct, concret, vocabulaire du métier, phrases courtes. On parle à un pro qui lit sur son
-téléphone entre le service du midi et la mise en place du soir.
+téléphone entre le service du midi et la mise en place du soir. L'auteur parle à la première
+personne quand il raconte son vécu (« je l'ai vu tourner un samedi soir »), au « nous » pour la
+méthode.
 
 - ✅ « La box lâche en plein service : on encaisse toujours, ou on sort le carnet ? »
 - ✅ « Un extra arrivé à 19 h doit encaisser seul à 20 h. »

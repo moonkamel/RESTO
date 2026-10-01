@@ -17,9 +17,9 @@
 }
 
 /* ------------------------------------------------------------------
- * Direction « Ardoise & Laiton »
- * Cabinet de conseil haut de gamme, ancré en cuisine : ardoise profonde,
- * laiton (cuivres de la batterie), grille inox.
+ * Direction « Ardoise & Laiton », version lumineuse
+ * Fond ardoise à grille de points, cadres lumineux laiton → inox,
+ * maquettes d'écrans en lévitation. Laiton = cuivres de la batterie.
  * Ratios vérifiés (WCAG) : texte ≥ 15:1, secondaire ≥ 6,8:1, laiton ≥ 5:1.
  * Les bandeaux « night » (en-tête, hero, pied de page) restent sombres
  * dans les deux modes.
@@ -41,6 +41,9 @@
   --night-muted: #aeb6c0;
   --night-brass: #d2b07a;
   --night-line: #222b35;
+  --night-steel: #8fa3b8; /* second ton des dégradés lumineux */
+  --glow: rgb(122 92 36 / 0.14); /* halo des cartes */
+  --night-glow: rgb(210 176 122 / 0.35); /* halo des bandeaux sombres */
 
   /* Tokens shadcn/ui, dérivés de la palette */
   --background: var(--canvas);
@@ -77,6 +80,7 @@
     --line-strong: #5a6573;
     --night: #070a0e;
     --night-line: #1c242e;
+    --glow: rgb(210 176 122 / 0.22);
     --secondary: #1a222c;
     --muted: #1a222c;
     --accent: #1a222c;
@@ -96,6 +100,7 @@
   --line-strong: #5a6573;
   --night: #070a0e;
   --night-line: #1c242e;
+  --glow: rgb(210 176 122 / 0.22);
   --secondary: #1a222c;
   --muted: #1a222c;
   --accent: #1a222c;
@@ -135,6 +140,7 @@
   --color-night-muted: var(--night-muted);
   --color-night-brass: var(--night-brass);
   --color-night-line: var(--night-line);
+  --color-night-steel: var(--night-steel);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
@@ -179,25 +185,102 @@
 
 @layer components {
   /*
-   * Bandeau sombre (en-tête, hero, pied de page), identique dans les deux modes.
-   * .night-grid ajoute la grille inox : le plan de travail vu d'en haut.
+   * Bandeau sombre (en-tête, hero, parcours, pied de page), identique dans les deux modes.
    */
   .night {
     background-color: var(--night);
     color: var(--night-ink);
   }
-  .night-grid {
-    background-image:
-      radial-gradient(ellipse 80% 70% at 70% 0%, transparent 0%, var(--night) 75%),
-      linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px);
-    background-size:
-      100% 100%,
-      48px 48px,
-      48px 48px;
+
+  /* Grille de points, estompée sur les bords. */
+  .dot-grid {
+    position: relative;
+    isolation: isolate;
+  }
+  .dot-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(rgb(255 255 255 / 0.11) 1px, transparent 1.5px);
+    background-size: 26px 26px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 30%, transparent 100%);
+    pointer-events: none;
   }
 
-  /* Surtitre : petites capitales espacées, laiton. */
+  /* Halo diffus laiton / inox derrière un visuel. */
+  .aura {
+    position: absolute;
+    inset: 10% -15% -20%;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse 30% 40% at 32% 60%, rgb(210 176 122 / 0.3), transparent),
+      radial-gradient(ellipse 30% 40% at 68% 60%, rgb(143 163 184 / 0.24), transparent);
+    pointer-events: none;
+  }
+
+  /* Cadre lumineux : bordure en dégradé laiton → inox + halo. */
+  .glow-frame {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--frame-fill, var(--night)), var(--frame-fill, var(--night))) padding-box,
+      linear-gradient(
+          135deg,
+          var(--night-brass),
+          rgb(210 176 122 / 0.15) 40%,
+          rgb(143 163 184 / 0.15) 60%,
+          var(--night-steel)
+        )
+        border-box;
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.2),
+      0 20px 60px -20px var(--night-glow),
+      0 0 40px -12px rgb(143 163 184 / 0.25);
+  }
+
+  /* Maquette d'écran (décorative). */
+  .screen {
+    --frame-fill: #0d1218;
+    border-radius: 0.875rem;
+    overflow: hidden;
+  }
+  .screen-bar {
+    display: flex;
+    gap: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    border-bottom: 1px solid var(--night-line);
+  }
+  .screen-bar > span {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.18);
+  }
+  .skeleton {
+    height: 0.375rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.1);
+  }
+  .pill-glow {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--night-brass), var(--night-steel));
+    box-shadow: 0 0 14px rgb(210 176 122 / 0.55);
+  }
+
+  /* Reflet au sol sous les maquettes. */
+  .floor {
+    height: 3rem;
+    margin-top: -0.5rem;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 30%,
+      rgb(210 176 122 / 0.28),
+      rgb(143 163 184 / 0.1) 50%,
+      transparent
+    );
+  }
+
+  /* Surtitre : petites capitales espacées. */
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 0.75rem;
@@ -205,24 +288,35 @@
     text-transform: uppercase;
   }
 
+  /* Texte en dégradé laiton → inox (titres d'accroche, chiffres clés). */
+  .text-shine {
+    background: linear-gradient(100deg, #f1dfbd, var(--night-brass) 45%, var(--night-steel));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /*
    * Élément signature : la fiche technique.
-   * Carte sobre, filet laiton en tête, numérotation en chasse fixe.
+   * Bordure en dégradé, halo discret (plus marqué en mode sombre).
    */
   .spec-card {
     position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    border-radius: 1rem;
     padding: 1.5rem;
+    background:
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      linear-gradient(140deg, var(--brass), var(--line) 35%, var(--line) 65%, var(--line-strong))
+        border-box;
+    box-shadow: 0 18px 50px -24px var(--glow);
+    transition:
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
   }
-  .spec-card::before {
-    content: "";
-    position: absolute;
-    inset: -1px -1px auto;
-    height: 2px;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    background: var(--brass);
+  .spec-card:hover {
+    box-shadow: 0 22px 60px -18px var(--glow);
+    transform: translateY(-2px);
   }
 
   /* Sceau « Validé en service ». */
@@ -246,9 +340,10 @@
     height: 0.375rem;
     border-radius: 999px;
     background: currentColor;
+    box-shadow: 0 0 8px currentColor;
   }
 
-  /* Ligne de fiche : libellé ……… valeur */
+  /* Ligne de fiche : libellé ——— valeur */
   .spec-line {
     display: flex;
     align-items: baseline;
@@ -263,8 +358,62 @@
   }
   .spec-line > :last-child {
     order: 2;
-    white-space: nowrap;
     font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+
+  /* Barre de progression de lecture sous l'en-tête (CSS seul, sans JS). */
+  .scroll-progress {
+    height: 2px;
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, var(--night-brass), var(--night-steel));
+    box-shadow: 0 0 10px rgb(210 176 122 / 0.6);
+  }
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+  @keyframes scroll-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Bouton principal lumineux. */
+  .btn-glow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    background: linear-gradient(100deg, #e6cb9a, var(--night-brass) 55%, #b8925a);
+    color: #0b0f14;
+    font-weight: 600;
+    box-shadow: 0 8px 30px -8px rgb(210 176 122 / 0.6);
+    transition: box-shadow 0.2s ease;
+  }
+  .btn-glow:hover {
+    box-shadow: 0 10px 40px -6px rgb(210 176 122 / 0.8);
+  }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    color: var(--night-ink);
+    transition: border-color 0.2s ease;
+  }
+  .btn-ghost:hover {
+    border-color: var(--night-brass);
   }
 }
 
