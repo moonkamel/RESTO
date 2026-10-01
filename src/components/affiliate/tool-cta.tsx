@@ -28,7 +28,7 @@ export function ToolCta({ tool, fromPath, className }: ToolCtaProps) {
           <span className="sr-only">(nouvel onglet, {cta.mention.toLowerCase()})</span>
         </a>
       ) : (
-        <Link href={cta.href} className="btn-glow">
+        <Link href={cta.href} prefetch={false} className="btn-glow">
           <PhoneCall aria-hidden className="size-4" />
           {cta.label}
         </Link>

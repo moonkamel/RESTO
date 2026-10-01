@@ -43,12 +43,16 @@ export const toolSchema = z
     publisher: text,
     category: z.enum(TOOL_CATEGORIES),
     pricingModel: z.enum(PRICING_MODELS),
-    /** € HT par mois et par poste. null = pas d'abonnement. */
+    /** € HT par mois pour le premier poste. null = pas d'abonnement. */
     subscriptionMonthlyHT: euros.nullable(),
-    /** € HT, achat du matériel de base. 0 = fourni ; null = aucun matériel nécessaire. */
+    /** € HT par mois pour chaque poste supplémentaire. null si et seulement si pas d'abonnement. */
+    extraStationMonthlyHT: euros.nullable(),
+    /** € HT d'achat du matériel, par poste équipé. 0 = fourni ; null = aucun matériel nécessaire. */
     hardwarePriceHT: euros.nullable(),
     /** Taux de commission carte en %. null = pas d'encaissement carte intégré. */
     cardCommissionRate: z.number().min(0).max(15).nullable(),
+    /** € HT fixes par transaction carte. null si et seulement si pas d'encaissement intégré. */
+    cardFixedFeeHT: z.number().min(0).max(5).nullable(),
     /** Durée d'engagement en mois. 0 = sans engagement. */
     commitmentMonths: z.int().min(0).max(120),
     establishmentTypes: z
@@ -83,6 +87,21 @@ export const toolSchema = z
         code: "custom",
         path: ["cardCommissionRate"],
         message: "Taux de commission obligatoire (modèle à la commission ou terminal de paiement)",
+      });
+    }
+    if ((tool.extraStationMonthlyHT === null) !== (tool.subscriptionMonthlyHT === null)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["extraStationMonthlyHT"],
+        message: "Prix du poste supplémentaire : renseigné si et seulement si il y a un abonnement",
+      });
+    }
+    if ((tool.cardFixedFeeHT === null) !== (tool.cardCommissionRate === null)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["cardFixedFeeHT"],
+        message:
+          "Frais fixes par transaction : renseignés (0 si aucun) si et seulement si il y a un taux de commission",
       });
     }
     if (tool.verifiedAt > new Date().toISOString().slice(0, 10)) {

@@ -7,8 +7,9 @@ import { parseTools, type RestaurantTool } from "./tools.schema.ts";
  * le site pendant le développement. Remplacer chaque outil par un outil réel, vérifié à la
  * source (grille tarifaire, contrat, démo), puis passer isPlaceholder à false.
  *
- * Unités : subscriptionMonthlyHT en € HT/mois/poste ; hardwarePriceHT en € HT ;
- * cardCommissionRate en % ; commitmentMonths en mois.
+ * Unités : subscriptionMonthlyHT (1er poste) et extraStationMonthlyHT (poste suivant) en € HT/mois ;
+ * hardwarePriceHT en € HT par poste ; cardCommissionRate en % ; cardFixedFeeHT en € HT par
+ * transaction ; commitmentMonths en mois. Détail des règles : tools.schema.ts.
  * Lien d'affiliation : variable d'environnement AFFILIATE_URL_<SLUG> (voir .env.example).
  */
 const data: RestaurantTool[] = [
@@ -20,8 +21,10 @@ const data: RestaurantTool[] = [
     category: "caisse",
     pricingModel: "abonnement",
     subscriptionMonthlyHT: 50, // PLACEHOLDER
+    extraStationMonthlyHT: 30, // PLACEHOLDER
     hardwarePriceHT: 1000, // PLACEHOLDER
     cardCommissionRate: null, // PLACEHOLDER
+    cardFixedFeeHT: null,
     commitmentMonths: 12, // PLACEHOLDER
     establishmentTypes: ["restaurant", "brasserie", "bar"],
     multiSite: true, // PLACEHOLDER
@@ -44,8 +47,10 @@ const data: RestaurantTool[] = [
     category: "paiement",
     pricingModel: "commission",
     subscriptionMonthlyHT: null,
+    extraStationMonthlyHT: null,
     hardwarePriceHT: 50, // PLACEHOLDER
     cardCommissionRate: 1.5, // PLACEHOLDER
+    cardFixedFeeHT: 0.1, // PLACEHOLDER
     commitmentMonths: 0, // PLACEHOLDER
     establishmentTypes: ["food-truck", "boulangerie", "restauration-rapide"],
     multiSite: false, // PLACEHOLDER
@@ -68,8 +73,10 @@ const data: RestaurantTool[] = [
     category: "reservation",
     pricingModel: "mixte",
     subscriptionMonthlyHT: 30, // PLACEHOLDER
+    extraStationMonthlyHT: 20, // PLACEHOLDER
     hardwarePriceHT: null,
     cardCommissionRate: 2, // PLACEHOLDER
+    cardFixedFeeHT: 0.2, // PLACEHOLDER
     commitmentMonths: 0, // PLACEHOLDER
     establishmentTypes: ["restaurant", "brasserie"],
     multiSite: true, // PLACEHOLDER
@@ -92,8 +99,10 @@ const data: RestaurantTool[] = [
     category: "commande-en-ligne",
     pricingModel: "abonnement",
     subscriptionMonthlyHT: 40, // PLACEHOLDER
+    extraStationMonthlyHT: 40, // PLACEHOLDER
     hardwarePriceHT: null,
     cardCommissionRate: null, // PLACEHOLDER
+    cardFixedFeeHT: null,
     commitmentMonths: 12, // PLACEHOLDER
     establishmentTypes: ["restauration-rapide", "food-truck"],
     multiSite: false, // PLACEHOLDER
@@ -105,6 +114,32 @@ const data: RestaurantTool[] = [
     fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
     partnerProgram: "aucun",
     slug: "exemple-commande-d",
+    verifiedAt: "2026-10-01",
+    isPlaceholder: true,
+  },
+  {
+    // PLACEHOLDER — outil fictif
+    id: "exemple-caisse-e",
+    name: "[Caisse + paiement exemple E]",
+    publisher: "[Éditeur E]",
+    category: "caisse",
+    pricingModel: "mixte",
+    subscriptionMonthlyHT: 30, // PLACEHOLDER
+    extraStationMonthlyHT: 15, // PLACEHOLDER
+    hardwarePriceHT: 400, // PLACEHOLDER
+    cardCommissionRate: 1.2, // PLACEHOLDER
+    cardFixedFeeHT: 0, // PLACEHOLDER
+    commitmentMonths: 24, // PLACEHOLDER
+    establishmentTypes: ["restaurant", "brasserie", "boulangerie"],
+    multiSite: true, // PLACEHOLDER
+    worksOffline: true, // PLACEHOLDER
+    mealVouchers: true, // PLACEHOLDER
+    deliveryIntegrations: [],
+    strengths: ["[Point fort à renseigner]"],
+    watchouts: ["[Point de vigilance à renseigner]"],
+    fieldReview: "[AVIS TERRAIN À RÉDIGER — ce que l'outil donne en plein coup de feu.]",
+    partnerProgram: "apport-affaires",
+    slug: "exemple-caisse-e",
     verifiedAt: "2026-10-01",
     isPlaceholder: true,
   },

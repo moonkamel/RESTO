@@ -36,6 +36,10 @@
   --night-steel: #8fa3b8; /* second ton des dégradés lumineux */
   --glow: rgb(122 92 36 / 0.14); /* halo des cartes */
   --night-glow: rgb(210 176 122 / 0.35); /* halo des bandeaux sombres */
+  /* Graphiques : 3 teintes validées (daltonisme, contraste) par mode. */
+  --chart-1: #9a6e22; /* abonnement */
+  --chart-2: #3d72b8; /* matériel */
+  --chart-3: #c0533a; /* frais carte */
 
   /* Tokens shadcn/ui, dérivés de la palette */
   --background: var(--canvas);
@@ -73,6 +77,9 @@
   --night: #070a0e;
   --night-line: #1c242e;
   --glow: rgb(210 176 122 / 0.22);
+  --chart-1: #b8873a;
+  --chart-2: #4f8bd0;
+  --chart-3: #d0674a;
   --secondary: #1a222c;
   --muted: #1a222c;
   --accent: #1a222c;
@@ -113,6 +120,9 @@
   --color-night-brass: var(--night-brass);
   --color-night-line: var(--night-line);
   --color-night-steel: var(--night-steel);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
 
   --radius-sm: calc(var(--radius) - 2px);
   --radius-md: var(--radius);
@@ -372,6 +382,55 @@
   .btn-glow:hover {
     box-shadow: 0 10px 40px -6px rgb(210 176 122 / 0.8);
   }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    transition: border-color 0.2s ease;
+  }
+  .btn-outline:hover {
+    border-color: var(--brass);
+  }
+
+  /* Champs de formulaire. */
+  .field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .field-hint {
+    font-size: 0.8125rem;
+    color: var(--ink-muted);
+  }
+  .field-input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.625rem;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+  }
+  .field-input:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--destructive);
+  }
+  .field-error {
+    font-size: 0.8125rem;
+    color: var(--destructive);
+  }
+
   .btn-ghost {
     display: inline-flex;
     align-items: center;

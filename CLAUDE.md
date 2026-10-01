@@ -56,7 +56,7 @@ src/
     (comparatifs)/…          # P4 · /logiciel-caisse-restaurant, etc.
     (etablissements)/…       # P4 · /caisse-food-truck, etc.
     avis/[tool]/             # P4 · avis par outil
-    calculateur-cout-caisse/ # P3
+    calculateur-cout-caisse/ # calculateur abonnement / commission
     guides/[slug]/           # P5 · articles
     mise-en-relation/        # P6 · formulaire 3 étapes
     admin/leads/             # P6 · suivi des leads (protégé)
@@ -65,7 +65,9 @@ src/
     ui/                      # shadcn/ui
     layout/                  # header, footer, thème
     brand/                   # élément signature (fiche technique, sceau)
-    affiliate/ tools/ calculator/ leads/ seo/   # à venir
+    affiliate/               # ToolCta, DisclosureBanner
+    calculator/              # CostCalculator (client), CostChart
+    tools/ leads/ seo/       # à venir
   config/site.ts             # nom, URL (valeurs entre crochets à remplir)
   config/author.ts           # parcours, chiffres clés, citation de l'auteur (faits réels uniquement)
   data/tools.ts              # SEULE source des données outils (remplie par le propriétaire)
@@ -75,7 +77,9 @@ src/
     affiliate.ts             # URL d'affiliation (env), CTA selon le programme partenaire
     go-redirect.ts           # logique de /go/[tool] ; plausible.ts : API Events
     content-guard.ts         # détection des placeholders, mode strict
-    cost/                    # P3 · calculs purs + tests
+    cost/cost.ts             # calculateur : coûts, classement, point de bascule (testé à la main)
+    format.ts                # € et dates en français
+    routes.ts                # chemins internes partagés (jamais exportés d'un module client)
     theme.ts utils.ts …
 ```
 
@@ -105,11 +109,28 @@ src/
 
 Décisions prises :
 
-- Le calculateur (P3) compare des offres « caisse + encaissement » (abonnement + matériel +
-  commission carte), car la commission vient surtout du TPE.
+- Le calculateur compare les offres des catégories `caisse` et `paiement` : abonnement (1er poste
+  - postes supplémentaires) + matériel par poste + frais carte (taux % + frais fixes par
+    transaction). Une caisse sans paiement intégré n'est comparée que si l'utilisateur saisit son
+    taux carte actuel. Le classement ne dépend QUE du coût calculé.
 - Outils en apport d'affaires (sans lien d'affiliation) : le bouton mène au formulaire
   `/mise-en-relation`, jamais à `/go/`.
 - Aucune transmission automatique de lead : validation manuelle par le propriétaire.
+
+## Calculateur
+
+- Formules : `coût = fixe + pente × CA mensuel`, avec
+  `fixe = (abonnement + poste supp. × (postes − 1)) × mois + matériel × postes` et
+  `pente = mois × part carte × (taux + frais fixes / ticket moyen)`. Frais carte hors TVA,
+  abonnement et matériel HT. Toute modification de formule = nouveau cas vérifié à la main dans
+  `cost.test.ts` (calcul écrit en commentaire).
+- Point de bascule : CA où l'offre à la commission la moins chère et l'offre avec abonnement
+  (abonnement ou mixte) la moins chère coûtent autant.
+- Résultat : recommandation + « Voir l'offre » (affiliation) + « Être rappelé par l'éditeur »
+  (formulaire) ; pas de bouton si `partnerProgram: "aucun"`.
+- Graphique : barres empilées, couleurs `--chart-1..3` validées par le script de la skill
+  dataviz (daltonisme + contraste, clair et sombre). Le tableau de détail est la version
+  accessible.
 
 ## Liens partenaires et analytics
 
@@ -205,7 +226,7 @@ méthode.
 
 - [x] Phase 1 — Fondations (outillage, CLAUDE.md, direction visuelle « Ardoise & Laiton », thème clair/sombre)
 - [x] Phase 2 — Modèle de données et liens d'affiliation
-- [ ] Phase 3 — Calculateur de coût réel
+- [x] Phase 3 — Calculateur de coût réel
 - [ ] Phase 4 — Pages comparatif et avis
 - [ ] Phase 5 — Articles MDX et SEO
 - [ ] Phase 6 — Formulaire de mise en relation

@@ -10,9 +10,11 @@ import {
   WifiOff,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 import { HeroVisual } from "@/components/brand/hero-visual";
 import { Seal, SpecCard } from "@/components/brand/spec-card";
 import { author } from "@/config/author";
+import { CALCULATOR_PATH } from "@/lib/routes";
 
 const fieldCriteria = [
   {
@@ -176,7 +178,9 @@ export default function Home() {
                   mois.
                 </p>
               </div>
-              <Seal className="self-start sm:self-center">Bientôt</Seal>
+              <Link href={CALCULATOR_PATH} className="btn-glow self-start sm:self-center">
+                Faire le calcul <ArrowRight aria-hidden className="size-4" />
+              </Link>
             </div>
           </SpecCard>
         </section>

@@ -8,8 +8,10 @@ const valid: RestaurantTool = {
   category: "caisse",
   pricingModel: "abonnement",
   subscriptionMonthlyHT: 49,
+  extraStationMonthlyHT: 29,
   hardwarePriceHT: 0,
   cardCommissionRate: null,
+  cardFixedFeeHT: null,
   commitmentMonths: 12,
   establishmentTypes: ["brasserie"],
   multiSite: true,
@@ -72,6 +74,25 @@ describe("toolSchema", () => {
     expect(issues({ ...valid, establishmentTypes: [] })).toContain("establishmentTypes");
     expect(issues({ ...valid, strengths: [] })).toContain("strengths");
     expect(issues({ ...valid, fieldReview: "Trop court." })).toContain("fieldReview");
+  });
+
+  it("exige le prix du poste supplémentaire avec un abonnement, et seulement dans ce cas", () => {
+    expect(issues({ ...valid, extraStationMonthlyHT: null })).toContain("extraStationMonthlyHT");
+    expect(
+      issues({
+        ...valid,
+        pricingModel: "commission",
+        subscriptionMonthlyHT: null,
+        cardCommissionRate: 1.5,
+        cardFixedFeeHT: 0,
+      }),
+    ).toContain("extraStationMonthlyHT");
+  });
+
+  it("exige les frais fixes avec un taux de commission (0 si aucun), et seulement dans ce cas", () => {
+    expect(issues({ ...valid, cardCommissionRate: 1.5 })).toContain("cardFixedFeeHT");
+    expect(issues({ ...valid, cardCommissionRate: 1.5, cardFixedFeeHT: 0 })).toEqual([]);
+    expect(issues({ ...valid, cardFixedFeeHT: 0.1 })).toContain("cardFixedFeeHT");
   });
 
   it("refuse une date de vérification dans le futur", () => {

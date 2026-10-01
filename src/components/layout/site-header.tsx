@@ -3,12 +3,12 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { ThemeToggle } from "./theme-toggle";
 
-// Ancres de l'accueil en attendant les pages des phases 3 et 4.
+// Ancres de l'accueil en attendant les pages de la phase 4.
 const nav = [
   { href: "/#methode", label: "Méthode", icon: ShieldCheck },
   { href: "/#comparatifs", label: "Comparatifs", icon: LayoutGrid },
   { href: "/#parcours", label: "Parcours", icon: Route },
-  { href: "/#calculateur", label: "Calculateur", icon: Calculator },
+  { href: "/calculateur-cout-caisse", label: "Calculateur", icon: Calculator },
 ] as const;
 
 export function SiteHeader() {
