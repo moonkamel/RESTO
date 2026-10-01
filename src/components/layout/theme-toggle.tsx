@@ -26,7 +26,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Basculer entre mode clair et mode sombre"
-      className="inline-flex size-11 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-accent hover:text-ink"
+      className="inline-flex size-11 items-center justify-center rounded-md text-night-muted transition-colors hover:bg-white/10 hover:text-night-ink"
     >
       <Moon aria-hidden className="size-5 dark:hidden" />
       <Sun aria-hidden className="hidden size-5 dark:block" />

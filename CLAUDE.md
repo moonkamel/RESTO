@@ -61,7 +61,7 @@ src/
   components/
     ui/                      # shadcn/ui
     layout/                  # header, footer, thème
-    ticket/                  # élément signature (bon de commande)
+    brand/                   # élément signature (fiche technique, sceau)
     affiliate/ tools/ calculator/ leads/ seo/   # à venir
   config/site.ts             # nom, URL, auteur (valeurs entre crochets à remplir)
   data/tools.ts              # P2 · SEULE source des données outils (remplie par le propriétaire)
@@ -104,8 +104,8 @@ Décisions prises :
   fichier). Les pages ne font qu'afficher.
 - Imports via l'alias `@/`. `import type` pour les types (règle ESLint).
 - Noms de fichiers en kebab-case, composants en PascalCase, URL publiques en français.
-- Pas de couleur en dur dans les composants : utiliser les tokens (`bg-paper`, `bg-ticket`,
-  `text-ink`, `text-ink-muted`, `text-stamp`, `text-go`, `border-steel`) ou ceux de shadcn.
+- Pas de couleur en dur dans les composants : utiliser les tokens (`bg-canvas`, `bg-surface`,
+  `text-ink`, `text-ink-muted`, `text-brass`, `text-go`, `border-line`, `night`) ou ceux de shadcn.
 - **Aucune nouvelle dépendance sans l'annoncer au propriétaire** (nom + raison) avant
   l'installation.
 - Performance : Lighthouse mobile > 95. Polices via `next/font` (auto-hébergées), pas de script
@@ -113,29 +113,34 @@ Décisions prises :
 - Accessibilité : contrastes WCAG AA minimum, cibles tactiles ≥ 44 px, focus visible, tout
   fonctionne à 360 px de large, tableaux dans un conteneur à défilement horizontal.
 
-## Direction visuelle — piste A « Le Passe »
+## Direction visuelle — « Ardoise & Laiton »
 
-Le site évoque le passe d'une cuisine : chaque outil est un **bon de commande** accroché au rail.
+Cabinet de conseil haut de gamme, ancré en cuisine : ardoise profonde, laiton (les cuivres de la
+batterie), grille inox. Sobre, sombre, qui inspire confiance. Pas de gadget visuel.
 
-| Token         | Clair     | Sombre    | Usage                           |
-| ------------- | --------- | --------- | ------------------------------- |
-| `--paper`     | `#f6f3ec` | `#16181b` | fond (papier thermique / hotte) |
-| `--ticket`    | `#fffdf8` | `#212429` | surfaces, bons                  |
-| `--ink`       | `#1c1b19` | `#ede9e1` | texte                           |
-| `--ink-muted` | `#5e5a52` | `#a7a29a` | texte secondaire                |
-| `--stamp`     | `#b3261e` | `#f2685e` | accent, tampons, focus          |
-| `--go`        | `#2f6b3a` | `#6fbf7e` | validé / positif                |
-| `--steel`     | `#7b8089` | `#6a7079` | filets, bordures de champs      |
+| Token         | Clair     | Sombre    | Usage                                  |
+| ------------- | --------- | --------- | -------------------------------------- |
+| `--canvas`    | `#f4f3ef` | `#0b0f14` | fond de page                           |
+| `--surface`   | `#ffffff` | `#131a22` | cartes                                 |
+| `--ink`       | `#0e1318` | `#eceae4` | texte                                  |
+| `--ink-muted` | `#4a5260` | `#9aa3ae` | texte secondaire                       |
+| `--brass`     | `#7a5c24` | `#d2b07a` | accent, surtitres, focus               |
+| `--go`        | `#2e6b4a` | `#7cc39b` | validé / positif                       |
+| `--line`      | `#dcd9d1` | `#222b35` | filets                                 |
+| `--night`     | `#0e1318` | `#070a0e` | bandeaux sombres (en-tête, hero, pied) |
 
-- Typographies : **Archivo** (variable, titres en `font-stretch: 75%` et graisse 800, texte
-  courant normal) et **IBM Plex Mono** (prix, taux, dates, références de ticket).
+- Les bandeaux `.night` (en-tête, hero, pied de page) restent sombres dans les deux modes, avec
+  leurs propres tokens `--night-ink`, `--night-muted`, `--night-brass`, `--night-line`.
+  `.night-grid` ajoute la grille inox en fond.
+- Typographies : **Instrument Serif** (h1, h2 : une seule graisse, grandes tailles),
+  **Geist** (texte, h3 en 600), **Geist Mono** (prix, taux, dates, surtitres `.eyebrow`).
 - Thème : préférence système par défaut, forçable via `data-theme` sur `<html>` (bouton en
   en-tête, mémorisé en `localStorage`, appliqué avant le premier rendu par un script inline).
   Les variables sombres sont déclarées **deux fois** dans `globals.css` (media query + attribut) :
   un test Vitest vérifie qu'elles restent identiques.
-- Composants signature (`src/components/ticket/ticket.tsx`, classes dans `globals.css`) :
-  `Ticket` (bords dentelés, en-tête mono), `TicketRail` (barre inox, défilement horizontal sur
-  mobile), `Stamp` (verdict tamponné), classe `.ticket-line` (libellé ……… valeur).
+- Composants signature (`src/components/brand/spec-card.tsx`, classes dans `globals.css`) :
+  `SpecCard` (fiche technique : filet laiton en tête, numérotation mono), `Seal` (sceau
+  « Validé en service »), classe `.spec-line` (libellé ——— valeur), `.eyebrow` (surtitre).
 
 ## Ton éditorial
 
@@ -160,7 +165,7 @@ téléphone entre le service du midi et la mise en place du soir.
 
 ## Avancement
 
-- [x] Phase 1 — Fondations (outillage, CLAUDE.md, direction visuelle A, thème clair/sombre)
+- [x] Phase 1 — Fondations (outillage, CLAUDE.md, direction visuelle « Ardoise & Laiton », thème clair/sombre)
 - [ ] Phase 2 — Modèle de données et liens d'affiliation
 - [ ] Phase 3 — Calculateur de coût réel
 - [ ] Phase 4 — Pages comparatif et avis
