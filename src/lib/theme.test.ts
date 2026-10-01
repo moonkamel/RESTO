@@ -43,20 +43,19 @@ describe("themeInitScript", () => {
 });
 
 describe("globals.css", () => {
-  // Le thème sombre est déclaré deux fois (préférence système + data-theme).
-  // Ce test garantit que les deux blocs restent identiques.
-  it("déclare les mêmes variables sombres dans les deux blocs", () => {
-    const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
-    const media = css.match(/:root:not\(\[data-theme="light"\]\)\s*\{([^}]*)\}/)?.[1];
-    const attr = css.match(/:root\[data-theme="dark"\]\s*\{([^}]*)\}/)?.[1];
-    const normalize = (block: string | undefined) =>
-      (block ?? "")
-        .replace(/\/\*.*?\*\//g, "")
-        .split(";")
-        .map((d) => d.trim())
-        .filter(Boolean)
-        .sort();
-    expect(normalize(media).length).toBeGreaterThan(5);
-    expect(normalize(media)).toEqual(normalize(attr));
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  it("applique le thème sombre par défaut, sans dépendre de la préférence système", () => {
+    expect(css).not.toContain("prefers-color-scheme");
+    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\)\s*\{[^}]*color-scheme: dark/);
+  });
+
+  it("ne redéfinit en sombre que des variables déclarées en clair", () => {
+    const names = (block: string | undefined) =>
+      new Set([...(block ?? "").matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+    const light = names(css.match(/:root\s*\{([^}]*)\}/)?.[1]);
+    const dark = names(css.match(/:root:not\(\[data-theme="light"\]\)\s*\{([^}]*)\}/)?.[1]);
+    expect(dark.size).toBeGreaterThan(5);
+    for (const name of dark) expect(light, name).toContain(name);
   });
 });

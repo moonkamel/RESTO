@@ -7,9 +7,9 @@ export function isTheme(value: unknown): value is Theme {
 }
 
 /**
- * Script exécuté avant le premier rendu : applique le thème forcé par
+ * Script exécuté avant le premier rendu : applique le thème choisi par
  * l'utilisateur (localStorage) pour éviter un flash. Sans choix enregistré,
- * le CSS suit prefers-color-scheme.
+ * le CSS affiche le thème sombre (thème par défaut).
  */
 export const themeInitScript = `(function(){try{var t=localStorage.getItem(${JSON.stringify(
   THEME_STORAGE_KEY,

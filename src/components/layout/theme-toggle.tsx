@@ -3,10 +3,9 @@
 import { Moon, Sun } from "lucide-react";
 import { THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
 
+// Sombre par défaut : seul un choix explicite « light » active le mode clair.
 function resolvedTheme(): Theme {
-  const forced = document.documentElement.getAttribute("data-theme");
-  if (forced === "light" || forced === "dark") return forced;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
 }
 
 export function ThemeToggle() {

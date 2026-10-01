@@ -2,19 +2,10 @@
 @import "tw-animate-css";
 
 /*
- * Mode sombre : préférence système, sauf si l'utilisateur a forcé un thème
- * via l'attribut data-theme sur <html> (posé par le script anti-flash).
+ * Sombre par défaut. Le mode clair s'active uniquement par choix explicite
+ * (data-theme="light" sur <html>, posé par le bouton et le script anti-flash).
  */
-@custom-variant dark {
-  @media (prefers-color-scheme: dark) {
-    &:where(:root:not([data-theme="light"]) *) {
-      @slot;
-    }
-  }
-  &:where([data-theme="dark"], [data-theme="dark"] *) {
-    @slot;
-  }
-}
+@custom-variant dark (&:where(:root:not([data-theme="light"]) *));
 
 /* ------------------------------------------------------------------
  * Direction « Ardoise & Laiton », version lumineuse
@@ -25,6 +16,7 @@
  * dans les deux modes.
  * ------------------------------------------------------------------ */
 :root {
+  /* Valeurs du mode clair (actives seulement avec data-theme="light"). */
   color-scheme: light;
 
   /* Palette de marque */
@@ -67,28 +59,8 @@
   --radius: 0.375rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --canvas: #0b0f14;
-    --surface: #131a22;
-    --ink: #eceae4;
-    --ink-muted: #9aa3ae;
-    --brass: #d2b07a;
-    --go: #7cc39b;
-    --line: #222b35;
-    --line-strong: #5a6573;
-    --night: #070a0e;
-    --night-line: #1c242e;
-    --glow: rgb(210 176 122 / 0.22);
-    --secondary: #1a222c;
-    --muted: #1a222c;
-    --accent: #1a222c;
-    --destructive: #f2685e;
-  }
-}
-
-:root[data-theme="dark"] {
+/* Thème sombre : appliqué par défaut. */
+:root:not([data-theme="light"]) {
   color-scheme: dark;
   --canvas: #0b0f14;
   --surface: #131a22;
