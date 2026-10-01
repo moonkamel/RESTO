@@ -55,133 +55,136 @@ export function CostCalculator({
   const stations = Number(raw.stations) || 1;
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[22rem_1fr] lg:items-start">
-      <form
-        className="spec-card space-y-6 lg:sticky lg:top-24"
-        onSubmit={(e) => e.preventDefault()}
-        aria-label="Vos chiffres"
-      >
-        <p className="eyebrow text-brass">Vos chiffres</p>
+    // Mise en page selon la largeur disponible (page calculateur ou colonne d'article).
+    <div className="@container">
+      <div className="grid gap-8 @4xl:grid-cols-[22rem_1fr] @4xl:items-start">
+        <form
+          className="spec-card space-y-6 @4xl:sticky @4xl:top-24"
+          onSubmit={(e) => e.preventDefault()}
+          aria-label="Vos chiffres"
+        >
+          <p className="eyebrow text-brass">Vos chiffres</p>
 
-        <NumberField
-          label="CA mensuel encaissé"
-          suffix="€ TTC"
-          value={raw.monthlyRevenue}
-          onChange={set("monthlyRevenue")}
-          error={errors.monthlyRevenue}
-        />
+          <NumberField
+            label="CA mensuel encaissé"
+            suffix="€ TTC"
+            value={raw.monthlyRevenue}
+            onChange={set("monthlyRevenue")}
+            error={errors.monthlyRevenue}
+          />
 
-        <RangeField
-          label="Part payée par carte"
-          value={raw.cardSharePercent}
-          onChange={set("cardSharePercent")}
-          error={errors.cardSharePercent}
-        />
+          <RangeField
+            label="Part payée par carte"
+            value={raw.cardSharePercent}
+            onChange={set("cardSharePercent")}
+            error={errors.cardSharePercent}
+          />
 
-        <Field label="Nombre de postes d'encaissement" error={errors.stations}>
-          {(id, describedBy) => (
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="btn-outline size-12 shrink-0 px-0"
-                onClick={() => set("stations")(String(Math.max(1, stations - 1)))}
-                aria-label="Un poste de moins"
-              >
-                <Minus aria-hidden className="size-4" />
-              </button>
-              <input
-                id={id}
-                className="field-input text-center"
-                inputMode="numeric"
-                value={raw.stations}
-                onChange={(e) => set("stations")(e.target.value)}
-                aria-invalid={Boolean(errors.stations)}
-                aria-describedby={describedBy}
+          <Field label="Nombre de postes d'encaissement" error={errors.stations}>
+            {(id, describedBy) => (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="btn-outline size-12 shrink-0 px-0"
+                  onClick={() => set("stations")(String(Math.max(1, stations - 1)))}
+                  aria-label="Un poste de moins"
+                >
+                  <Minus aria-hidden className="size-4" />
+                </button>
+                <input
+                  id={id}
+                  className="field-input text-center"
+                  inputMode="numeric"
+                  value={raw.stations}
+                  onChange={(e) => set("stations")(e.target.value)}
+                  aria-invalid={Boolean(errors.stations)}
+                  aria-describedby={describedBy}
+                />
+                <button
+                  type="button"
+                  className="btn-outline size-12 shrink-0 px-0"
+                  onClick={() => set("stations")(String(Math.min(50, stations + 1)))}
+                  aria-label="Un poste de plus"
+                >
+                  <Plus aria-hidden className="size-4" />
+                </button>
+              </div>
+            )}
+          </Field>
+
+          <fieldset>
+            <legend className="field-label">Durée comparée</legend>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {DURATIONS.map((d) => (
+                <label
+                  key={d}
+                  className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-line-strong font-mono text-sm has-checked:border-brass has-checked:bg-brass has-checked:text-canvas has-focus-visible:outline-2 has-focus-visible:outline-ring"
+                >
+                  <input
+                    type="radio"
+                    name="months"
+                    value={d}
+                    checked={raw.months === String(d)}
+                    onChange={() => set("months")(String(d))}
+                    className="sr-only"
+                  />
+                  {d} mois
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <NumberField
+            label="Ticket moyen payé par carte"
+            suffix="€ TTC"
+            hint="Sert aux frais fixes par transaction."
+            value={raw.averageTicket}
+            onChange={set("averageTicket")}
+            error={errors.averageTicket}
+          />
+
+          <fieldset className="space-y-4 border-t border-line pt-5">
+            <legend className="sr-only">Caisse sans paiement intégré</legend>
+            <p className="field-hint">
+              <strong className="text-ink">Caisse sans paiement intégré ?</strong> Indiquez ce que
+              vous paie aujourd&apos;hui votre banque ou votre TPE pour la comparer aux autres.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <NumberField
+                label="Taux actuel"
+                suffix="%"
+                value={raw.externalCardRate}
+                onChange={set("externalCardRate")}
+                error={errors.externalCardRate}
+                placeholder="1,2"
               />
-              <button
-                type="button"
-                className="btn-outline size-12 shrink-0 px-0"
-                onClick={() => set("stations")(String(Math.min(50, stations + 1)))}
-                aria-label="Un poste de plus"
-              >
-                <Plus aria-hidden className="size-4" />
-              </button>
+              <NumberField
+                label="Frais fixes"
+                suffix="€"
+                value={raw.externalCardFixedFee}
+                onChange={set("externalCardFixedFee")}
+                error={errors.externalCardFixedFee}
+                placeholder="0,05"
+              />
+            </div>
+          </fieldset>
+        </form>
+
+        <section aria-labelledby="resultat" aria-live="polite" className="min-w-0 space-y-6">
+          <h2 id="resultat" className="sr-only">
+            Résultat
+          </h2>
+          {shown && shown.comparison.ranked.length > 0 ? (
+            <Results inputs={shown.inputs} comparison={shown.comparison} fromPath={fromPath} />
+          ) : (
+            <div className="spec-card text-ink-muted">
+              {shown
+                ? "Aucune offre comparable avec ces chiffres. Indiquez votre taux carte actuel pour comparer les caisses sans paiement intégré."
+                : "Corrigez les champs signalés pour voir le calcul."}
             </div>
           )}
-        </Field>
-
-        <fieldset>
-          <legend className="field-label">Durée comparée</legend>
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            {DURATIONS.map((d) => (
-              <label
-                key={d}
-                className="flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-line-strong font-mono text-sm has-checked:border-brass has-checked:bg-brass has-checked:text-canvas has-focus-visible:outline-2 has-focus-visible:outline-ring"
-              >
-                <input
-                  type="radio"
-                  name="months"
-                  value={d}
-                  checked={raw.months === String(d)}
-                  onChange={() => set("months")(String(d))}
-                  className="sr-only"
-                />
-                {d} mois
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <NumberField
-          label="Ticket moyen payé par carte"
-          suffix="€ TTC"
-          hint="Sert aux frais fixes par transaction."
-          value={raw.averageTicket}
-          onChange={set("averageTicket")}
-          error={errors.averageTicket}
-        />
-
-        <fieldset className="space-y-4 border-t border-line pt-5">
-          <legend className="sr-only">Caisse sans paiement intégré</legend>
-          <p className="field-hint">
-            <strong className="text-ink">Caisse sans paiement intégré ?</strong> Indiquez ce que
-            vous paie aujourd&apos;hui votre banque ou votre TPE pour la comparer aux autres.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <NumberField
-              label="Taux actuel"
-              suffix="%"
-              value={raw.externalCardRate}
-              onChange={set("externalCardRate")}
-              error={errors.externalCardRate}
-              placeholder="1,2"
-            />
-            <NumberField
-              label="Frais fixes"
-              suffix="€"
-              value={raw.externalCardFixedFee}
-              onChange={set("externalCardFixedFee")}
-              error={errors.externalCardFixedFee}
-              placeholder="0,05"
-            />
-          </div>
-        </fieldset>
-      </form>
-
-      <section aria-labelledby="resultat" aria-live="polite" className="min-w-0 space-y-6">
-        <h2 id="resultat" className="sr-only">
-          Résultat
-        </h2>
-        {shown && shown.comparison.ranked.length > 0 ? (
-          <Results inputs={shown.inputs} comparison={shown.comparison} fromPath={fromPath} />
-        ) : (
-          <div className="spec-card text-ink-muted">
-            {shown
-              ? "Aucune offre comparable avec ces chiffres. Indiquez votre taux carte actuel pour comparer les caisses sans paiement intégré."
-              : "Corrigez les champs signalés pour voir le calcul."}
-          </div>
-        )}
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
