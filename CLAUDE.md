@@ -182,8 +182,8 @@ Décisions prises :
 
 - Chaque page exporte `pageMetadata({ title, description, path, … })` (`src/lib/seo/metadata.ts`) :
   canonique, Open Graph, Twitter, image par défaut. Une route avec son propre
-  `opengraph-image.tsx` passe `image: "<chemin>/opengraph-image"` (Next n'hérite pas l'image
-  quand une page redéfinit`openGraph`).
+  `opengraph-image.tsx` lui passe son chemin via `image` : Next n'hérite pas l'image quand une
+  page redéfinit `openGraph`.
 - JSON-LD via `<JsonLd data={[…]} />` et les builders testés de `src/lib/seo/jsonld.ts` :
   `WebSite` (accueil), `Article` + `FAQPage` (guides), `Review` (avis, **seulement si l'outil a
   une note terrain** : pas d'avis noté sans test), `BreadcrumbList` (via `<Breadcrumbs />`).
